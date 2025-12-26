@@ -10,7 +10,7 @@ export const Desktop: React.FC<DesktopProps> = ({ children, backgroundImage }) =
     return (
         <div
             className={cn(
-                "min-h-screen w-full relative overflow-hidden font-sans text-retro-black selection:bg-retro-blue selection:text-white flex flex-row gap-4 p-4 items-stretch pb-14",
+                "h-screen w-full relative overflow-hidden font-sans text-retro-black selection:bg-retro-blue selection:text-white flex flex-row gap-4 p-4 items-stretch pb-14",
                 backgroundImage ? "bg-cover bg-center" : "bg-retro-teal"
             )}
             style={backgroundImage ? { backgroundImage: `url(${backgroundImage})` } : undefined}
