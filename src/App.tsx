@@ -6,7 +6,15 @@ import { Window } from '@/components/ui/Window';
 import { DesktopIcon } from '@/components/ui/DesktopIcon';
 import hdBackground from '@/assets/hd.png';
 
-export type WindowId = 'about' | 'projects' | 'contact';
+// App Components
+import { AboutMe } from '@/components/apps/AboutMe';
+import { Projects } from '@/components/apps/Projects';
+import { Contact } from '@/components/apps/Contact';
+import { Terminal } from '@/components/apps/Terminal';
+import { HubExplorer } from '@/components/apps/HubExplorer';
+import { RiceConfig, type RiceConfigState } from '@/components/apps/RiceConfig';
+
+export type WindowId = 'about' | 'projects' | 'contact' | 'terminal' | 'hub' | 'rice';
 
 interface WindowState {
   id: WindowId;
@@ -19,30 +27,41 @@ const INITIAL_WINDOWS: Record<WindowId, WindowState> = {
   about: { id: 'about', title: 'About Me', isOpen: true, isMinimized: false },
   projects: { id: 'projects', title: 'Projects', isOpen: false, isMinimized: false },
   contact: { id: 'contact', title: 'Contact', isOpen: false, isMinimized: false },
+  terminal: { id: 'terminal', title: 'Terminal', isOpen: false, isMinimized: false },
+  hub: { id: 'hub', title: 'Hub Explorer', isOpen: false, isMinimized: false },
+  rice: { id: 'rice', title: 'Rice Config', isOpen: false, isMinimized: false },
 };
 
 function App() {
   const [windows, setWindows] = useState<Record<WindowId, WindowState>>(INITIAL_WINDOWS);
   const [activeWindowId, setActiveWindowId] = useState<WindowId | null>('about');
   const [isHdBackground, setIsHdBackground] = useState(false);
+  const [riceConfig, setRiceConfig] = useState<RiceConfigState>({
+    gap: 16,
+    theme: 'retro',
+    showGlow: false
+  });
 
   const focusWindow = (id: WindowId) => {
     setActiveWindowId(id);
   };
 
-  const toggleWindow = (id: WindowId) => {
+  const toggleWindow = (id: string) => {
+    const winId = id as WindowId;
+    if (!windows[winId]) return; // Guard against invalid IDs from Terminal
+
     setWindows(prev => {
-      const isOpen = !prev[id].isOpen;
+      const isOpen = !prev[winId].isOpen;
       return {
         ...prev,
-        [id]: {
-          ...prev[id],
+        [winId]: {
+          ...prev[winId],
           isOpen,
           isMinimized: false
         }
       };
     });
-    if (!windows[id].isOpen) setActiveWindowId(id);
+    if (!windows[winId].isOpen) setActiveWindowId(winId);
   };
 
   const traverseWindow = (id: WindowId) => {
@@ -60,49 +79,17 @@ function App() {
   const renderWindowContent = (id: WindowId) => {
     switch (id) {
       case 'about':
-        return (
-          <div className="space-y-4">
-            <div className="flex items-start gap-4">
-              <img src="https://win98icons.alexmeub.com/icons/png/computer_explorer-5.png" className="w-16 h-16" />
-              <div>
-                <h2 className="text-xl font-bold mb-2">Welcome to my Portfolio!</h2>
-                <p className="mb-2">I am a passionate developer who loves retro aesthetics and modern web technologies.</p>
-                <p>This site is built with React, Tailwind CSS, and Shadcn UI, styled to look like Windows 95.</p>
-              </div>
-            </div>
-            <fieldset className="border-2 border-retro-white border-t-retro-dark-gray border-l-retro-dark-gray p-2">
-              <legend className="px-1">Skills</legend>
-              <ul className="list-disc list-inside">
-                <li>React & TypeScript</li>
-                <li>Tailwind CSS</li>
-                <li>Node.js</li>
-              </ul>
-            </fieldset>
-          </div>
-        );
+        return <AboutMe />;
       case 'projects':
-        return (
-          <div className="grid grid-cols-1 gap-4">
-            <div className="border-2 border-retro-in p-2 bg-white">
-              <h3 className="font-bold">Retro Portfolio</h3>
-              <p className="text-sm text-gray-600">This very website!</p>
-            </div>
-            <div className="border-2 border-retro-in p-2 bg-white">
-              <h3 className="font-bold">E-Commerce App</h3>
-              <p className="text-sm text-gray-600">A modern shopping experience.</p>
-            </div>
-          </div>
-        );
+        return <Projects />;
       case 'contact':
-        return (
-          <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-            <div className="flex flex-col">
-              <label className="text-sm">Email:</label>
-              <input type="email" className="border-2 border-retro-in px-1" />
-            </div>
-            <button className="px-4 py-1 bg-retro-gray shadow-retro active:shadow-retro-in">Send</button>
-          </form>
-        );
+        return <Contact />;
+      case 'terminal':
+        return <Terminal onOpenWindow={toggleWindow} />;
+      case 'hub':
+        return <HubExplorer />;
+      case 'rice':
+        return <RiceConfig config={riceConfig} onUpdate={(updates) => setRiceConfig(prev => ({ ...prev, ...updates }))} />;
       default:
         return null;
     }
@@ -131,6 +118,21 @@ function App() {
           onClick={() => toggleWindow('contact')}
         />
         <DesktopIcon
+          label="Terminal"
+          icon="https://win98icons.alexmeub.com/icons/png/console_prompt-0.png"
+          onClick={() => toggleWindow('terminal')}
+        />
+        <DesktopIcon
+          label="GitHub"
+          icon="https://win98icons.alexmeub.com/icons/png/msn_zones-0.png" // Using a placeholder icon for GitHub
+          onClick={() => toggleWindow('hub')}
+        />
+        <DesktopIcon
+          label="Rice Config"
+          icon="https://win98icons.alexmeub.com/icons/png/settings_gear-4.png"
+          onClick={() => toggleWindow('rice')}
+        />
+        <DesktopIcon
           label="Recycle Bin"
           icon="https://win98icons.alexmeub.com/icons/png/recycle_bin_empty-4.png"
           onClick={() => alert("Trash is empty!")}
@@ -138,11 +140,20 @@ function App() {
       </div>
 
       {/* Workspace - Tiling Area */}
-      <div className="flex-1 flex gap-4 overflow-hidden h-full">
+      <div
+        className="flex-1 flex overflow-hidden h-full transition-all duration-300"
+        style={{ gap: `${riceConfig.gap}px` }}
+      >
         {visibleWindows.length > 0 && (
           <>
             {/* Master Column (First Window) */}
-            <div className={cn("flex flex-col gap-4 h-full transition-all duration-300", visibleWindows.length > 1 ? "w-1/2" : "w-full")}>
+            <div
+              className={cn(
+                "flex flex-col h-full transition-all duration-300",
+                visibleWindows.length > 1 ? "w-1/2" : "w-full"
+              )}
+              style={{ gap: `${riceConfig.gap}px` }}
+            >
               <Window
                 key={visibleWindows[0].id}
                 title={visibleWindows[0].title}
@@ -150,16 +161,25 @@ function App() {
                 onClose={() => toggleWindow(visibleWindows[0].id)}
                 isActive={activeWindowId === visibleWindows[0].id}
                 onFocus={() => focusWindow(visibleWindows[0].id)}
-                className="h-full"
+                className="h-full transition-all duration-300"
+                style={{
+                  borderColor: riceConfig.theme === 'cyberpunk' ? '#facc15' : riceConfig.theme === 'vaporwave' ? '#f472b6' : undefined,
+                  boxShadow: riceConfig.showGlow
+                    ? (riceConfig.theme === 'cyberpunk' ? '0 0 15px #facc15' : '0 0 15px #f472b6')
+                    : undefined
+                }}
               >
-                {/* Content Logic (Duplicated for now, should extract to component ideally) */}
+                {/* Content Logic */}
                 {renderWindowContent(visibleWindows[0].id)}
               </Window>
             </div>
 
             {/* Stack Column (Remaining Windows) */}
             {visibleWindows.length > 1 && (
-              <div className="flex flex-col gap-4 h-full w-1/2 transition-all duration-300">
+              <div
+                className="flex flex-col h-full w-1/2 transition-all duration-300"
+                style={{ gap: `${riceConfig.gap}px` }}
+              >
                 {visibleWindows.slice(1).map(win => (
                   <Window
                     key={win.id}
@@ -168,7 +188,13 @@ function App() {
                     onClose={() => toggleWindow(win.id)}
                     isActive={activeWindowId === win.id}
                     onFocus={() => focusWindow(win.id)}
-                    className="h-auto min-h-0" // Override h-full to allow vertical splitting
+                    className="h-auto min-h-0 transition-all duration-300"
+                    style={{
+                      borderColor: riceConfig.theme === 'cyberpunk' ? '#facc15' : riceConfig.theme === 'vaporwave' ? '#f472b6' : undefined,
+                      boxShadow: riceConfig.showGlow
+                        ? (riceConfig.theme === 'cyberpunk' ? '0 0 15px #facc15' : '0 0 15px #f472b6')
+                        : undefined
+                    }}
                   >
                     {renderWindowContent(win.id)}
                   </Window>

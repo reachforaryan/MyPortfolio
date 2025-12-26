@@ -15,6 +15,7 @@ interface WindowProps {
     className?: string;
     isActive?: boolean;
     onFocus?: () => void;
+    style?: React.CSSProperties;
 }
 
 export const Window: React.FC<WindowProps> = ({
@@ -24,7 +25,8 @@ export const Window: React.FC<WindowProps> = ({
     onClose,
     className,
     isActive,
-    onFocus
+    onFocus,
+    style
 }) => {
     if (!isOpen) return null;
 
@@ -37,12 +39,15 @@ export const Window: React.FC<WindowProps> = ({
                 className
             )}
             onClick={onFocus}
+            style={style}
         >
             {/* Title Bar */}
-            <div className={cn(
-                "window-title-bar flex items-center justify-between px-1 py-0.5 cursor-default select-none mb-1 transition-colors duration-300",
-                isActive ? "bg-retro-blue text-white" : "bg-retro-dark-gray text-retro-gray-light"
-            )}>
+            < div className={
+                cn(
+                    "window-title-bar flex items-center justify-between px-1 py-0.5 cursor-default select-none mb-1 transition-colors duration-300",
+                    isActive ? "bg-retro-blue text-white" : "bg-retro-dark-gray text-retro-gray-light"
+                )
+            } >
                 <div className="flex items-center gap-1 font-bold text-sm">
                     <span>{title}</span>
                 </div>
@@ -60,12 +65,12 @@ export const Window: React.FC<WindowProps> = ({
                         <X size={10} />
                     </button>
                 </div>
-            </div>
+            </div >
 
             {/* Content */}
-            <div className="flex-1 bg-white border-2 border-retro-dark-gray border-b-retro-white border-r-retro-white p-2 overflow-auto">
+            < div className="flex-1 bg-white border-2 border-retro-dark-gray border-b-retro-white border-r-retro-white p-2 overflow-auto" >
                 {children}
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };
