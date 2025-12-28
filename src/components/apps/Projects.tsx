@@ -2,32 +2,13 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { ExternalLink, Github, Folder } from 'lucide-react';
 
-const PROJECTS = [
-    {
-        title: "Retro Portfolio",
-        desc: "A Windows 95 inspired OS in the browser. Features window management, themes, and apps.",
-        tags: ["React", "Tailwind", "Vite"],
-        color: "from-vapor-purple to-vapor-blue"
-    },
-    {
-        title: "Neon Commerce",
-        desc: "Next-gen shopping experience with 3D product previews and real-time inventory.",
-        tags: ["Next.js", "Three.js", "Stripe"],
-        color: "from-vapor-pink to-rose-400"
-    },
-    {
-        title: "Zen Task",
-        desc: "Minimalist productivity tool focusing on flow state and ambient soundscapes.",
-        tags: ["Vue", "Pinia", "Audio API"],
-        color: "from-vapor-mint to-teal-400"
-    }
-];
+import { PROJECTS_CONFIG } from '@/config';
 
 export const Projects: React.FC = () => {
     return (
         <div className="h-full p-6 overflow-y-auto custom-scrollbar">
             <div className="grid grid-cols-1 gap-6">
-                {PROJECTS.map((project, i) => (
+                {PROJECTS_CONFIG.map((project, i) => (
                     <motion.div
                         key={project.title}
                         initial={{ opacity: 0, x: -20 }}

@@ -59,6 +59,27 @@ export const DESKTOP_PET_CONFIG = {
     ]
 };
 
+export const PROJECTS_CONFIG = [
+    {
+        title: "EEG Signal Analytics",
+        desc: "Designed an AI pipeline to analyze brain waves for detecting seizures and migraines, achieving 95% accuracy in early diagnosis.",
+        tags: ["Python", "Scikit-learn", "PyTorch"],
+        color: "from-vapor-purple to-vapor-blue"
+    },
+    {
+        title: "Multimodal Polarity AI",
+        desc: "Built a vision-language model that understands both images and text to detect sentiment, responding 30% faster than standard models.",
+        tags: ["Python", "PyTorch", "Transformers"],
+        color: "from-vapor-pink to-rose-400"
+    },
+    {
+        title: "Agentic AI Discord Bot",
+        desc: "Created a smart bot where multiple AI agents collaborate to solve complex tasks and manage workflows automatically.",
+        tags: ["CrewAI", "Discord.py", "Python"],
+        color: "from-vapor-mint to-teal-400"
+    }
+];
+
 export const ABOUT_ME_CONFIG = {
     GREETING: "Aryan Singh",
     AVATAR_URL: "https://win98icons.alexmeub.com/icons/png/computer_explorer-5.png",

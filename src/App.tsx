@@ -120,11 +120,7 @@ function App() {
           icon="https://win98icons.alexmeub.com/icons/png/cd_audio_cd-1.png"
           onClick={() => toggleWindow('music')}
         />
-        <DesktopIcon
-          label="Recycle Bin"
-          icon="https://win98icons.alexmeub.com/icons/png/recycle_bin_empty-4.png"
-          onClick={() => alert("Trash is empty!")}
-        />
+
       </div>
 
       {/* Workspace - Tiling Area */}
