@@ -1,4 +1,4 @@
-export type WindowId = 'about' | 'projects' | 'contact' | 'terminal' | 'hub' | 'rice' | 'music';
+export type WindowId = 'about' | 'projects' | 'contact' | 'terminal' | 'hub' | 'rice' | 'music' | 'blog';
 
 export interface WindowState {
     id: WindowId;
@@ -16,6 +16,7 @@ export const INITIAL_WINDOWS: Record<WindowId, WindowState> = {
     hub: { id: 'hub', title: 'Hub Explorer', isOpen: false, isMinimized: false, isMaximized: false },
     rice: { id: 'rice', title: 'Rice Config', isOpen: false, isMinimized: false, isMaximized: false },
     music: { id: 'music', title: 'VaporWaves', isOpen: false, isMinimized: false, isMaximized: false },
+    blog: { id: 'blog', title: 'My Blog', isOpen: false, isMinimized: false, isMaximized: false },
 };
 
 export type Theme = 'retro' | 'cyberpunk' | 'vaporwave';

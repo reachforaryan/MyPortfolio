@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { cn } from '@/lib/utils';
@@ -23,6 +24,7 @@ import { Terminal } from '@/components/apps/Terminal';
 import { HubExplorer } from '@/components/apps/HubExplorer';
 import { RiceConfig } from '@/components/apps/RiceConfig';
 import { MusicPlayer } from '@/components/apps/MusicPlayer';
+import { Blog } from '@/components/apps/Blog';
 
 function App() {
   const [windows, setWindows] = useLocalStorage<Record<WindowId, WindowState>>('desktop:windows', INITIAL_WINDOWS);
@@ -30,6 +32,18 @@ function App() {
   const [isHdBackground, setIsHdBackground] = useLocalStorage('desktop:isHdBackground', true);
   const [riceConfig, setRiceConfig] = useLocalStorage<RiceConfigState>('desktop:riceConfig', INITIAL_RICE_CONFIG);
   const isMobile = useMediaQuery("(max-width: 768px)");
+
+  // Hydrate windows state with any new apps that might have been added to config (like Blog)
+  // but aren't in the user's localStorage yet.
+  useEffect(() => {
+    const missingKeys = Object.keys(INITIAL_WINDOWS).filter(key => !windows[key as WindowId]);
+    if (missingKeys.length > 0) {
+      setWindows(prev => ({
+        ...INITIAL_WINDOWS,
+        ...prev
+      }));
+    }
+  }, [windows, setWindows]);
 
   const focusWindow = (id: WindowId) => {
     setActiveWindowId(id);
@@ -109,6 +123,8 @@ function App() {
         return <RiceConfig config={riceConfig} onUpdate={(updates) => setRiceConfig(prev => ({ ...prev, ...updates }))} />;
       case 'music':
         return <MusicPlayer />;
+      case 'blog':
+        return <Blog />;
       default:
         return null;
     }
@@ -155,6 +171,11 @@ function App() {
           label="Music"
           icon="https://win98icons.alexmeub.com/icons/png/cd_audio_cd-1.png"
           onClick={() => openWindow('music')}
+        />
+        <DesktopIcon
+          label="My Blog"
+          icon="https://win98icons.alexmeub.com/icons/png/notepad-0.png"
+          onClick={() => openWindow('blog')}
         />
 
       </div>
