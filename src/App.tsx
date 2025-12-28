@@ -39,7 +39,8 @@ function App() {
   const [riceConfig, setRiceConfig] = useState<RiceConfigState>({
     gap: 16,
     theme: 'retro',
-    showGlow: false
+    showGlow: false,
+    showCrt: true,
   });
 
   const focusWindow = (id: WindowId) => {
@@ -99,7 +100,7 @@ function App() {
   const visibleWindows = Object.values(windows).filter(w => w.isOpen && !w.isMinimized);
 
   return (
-    <Desktop backgroundImage={isHdBackground ? hdBackground : undefined}>
+    <Desktop backgroundImage={isHdBackground ? hdBackground : undefined} enableCrt={riceConfig.showCrt}>
       {/* Sidebar - Persistent Desktop Icons (Stage Manager) */}
       <div className="flex flex-col gap-6 w-[100px] h-full pt-4">
         <DesktopIcon

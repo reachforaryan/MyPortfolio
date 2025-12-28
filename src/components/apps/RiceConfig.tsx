@@ -1,5 +1,5 @@
 import React from 'react';
-import {Monitor, Layout } from 'lucide-react';
+import { Monitor, Layout } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export type Theme = 'retro' | 'cyberpunk' | 'vaporwave';
@@ -8,6 +8,7 @@ export interface RiceConfigState {
     gap: number;
     theme: Theme;
     showGlow: boolean;
+    showCrt: boolean;
 }
 
 interface RiceConfigProps {
@@ -103,6 +104,23 @@ export const RiceConfig: React.FC<RiceConfigProps> = ({ config, onUpdate }) => {
                             <div className={cn(
                                 "absolute top-0.5 w-4 h-4 bg-white border border-black transition-all",
                                 config.showGlow ? "left-6" : "left-0.5"
+                            )} />
+                        </button>
+                    </div>
+
+                    {/* CRT Toggle */}
+                    <div className="flex items-center justify-between mt-2">
+                        <label className="text-sm">CRT Effects</label>
+                        <button
+                            onClick={() => onUpdate({ showCrt: !config.showCrt })}
+                            className={cn(
+                                "w-12 h-6 border-2 relative transition-all",
+                                config.showCrt ? "bg-green-500 border-green-700" : "bg-gray-300 border-gray-500"
+                            )}
+                        >
+                            <div className={cn(
+                                "absolute top-0.5 w-4 h-4 bg-white border border-black transition-all",
+                                config.showCrt ? "left-6" : "left-0.5"
                             )} />
                         </button>
                     </div>

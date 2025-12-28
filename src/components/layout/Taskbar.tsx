@@ -28,7 +28,7 @@ export const Taskbar: React.FC<TaskbarProps> = ({ windows = [], activeWindowId, 
                     className={cn(
                         "flex items-center gap-2 px-3 py-1 bg-white/5 hover:bg-white/10 font-bold text-sm mr-2 select-none text-white rounded transaction-colors duration-200 border border-white/5",
                         startOpen
-                            ? "bg-neon-pink/20 border-neon-pink/50 text-neon-pink shadow-[0_0_10px_rgba(255,0,255,0.3)]"
+                            ? "bg-vapor-pink/20 border-vapor-pink/50 text-vapor-pink shadow-[0_0_10px_rgba(244,184,228,0.3)]"
                             : "shadow-sm active:translate-y-[1px]"
                     )}
                     onClick={() => setStartOpen(!startOpen)}
@@ -48,7 +48,7 @@ export const Taskbar: React.FC<TaskbarProps> = ({ windows = [], activeWindowId, 
                             className={cn(
                                 "flex items-center gap-2 px-3 py-1 min-w-[150px] max-w-[200px] text-left truncate text-sm select-none rounded transition-all duration-200 border border-transparent",
                                 activeWindowId === win.id && !win.isMinimized
-                                    ? "bg-white/10 text-neon-cyan border-white/10 shadow-[0_0_10px_rgba(0,255,255,0.2)] font-semibold" // Active
+                                    ? "bg-white/10 text-vapor-blue border-white/10 shadow-[0_0_10px_rgba(137,220,235,0.2)] font-semibold" // Active
                                     : "bg-transparent text-gray-300 hover:bg-white/5 hover:text-white" // Inactive
                             )}
                             onClick={() => onToggleWindow && onToggleWindow(win.id)}

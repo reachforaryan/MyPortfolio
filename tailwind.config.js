@@ -50,11 +50,12 @@ export default {
           white: '#ffffff',
           black: '#000000',
         },
-        neon: {
-          pink: '#ff00ff',
-          cyan: '#00ffff',
-          purple: '#bc13fe',
-          green: '#00ff00',
+        vapor: {
+          purple: '#d6d6f5', // Lavender
+          pink: '#f4b8e4',   // Soft Pink
+          mint: '#81ec9d',   // Mint
+          blue: '#89dceb',   // Soft Cyan
+          yellow: '#fae3b0', // Pale Cream
         }
       },
       borderRadius: {
@@ -67,8 +68,10 @@ export default {
         'retro-in': 'inset 1px 1px #808080, inset -1px -1px #ffffff, inset 2px 2px #000000, inset -2px -2px #dfdfdf',
         'retro-out': 'inset 1px 1px #ffffff, inset -1px -1px #808080, inset 2px 2px #dfdfdf, inset -2px -2px #000000',
         'retro-out': 'inset 1px 1px #ffffff, inset -1px -1px #808080, inset 2px 2px #dfdfdf, inset -2px -2px #000000',
-        'neon-blue': '0 0 5px theme("colors.neon.cyan"), 0 0 20px theme("colors.neon.cyan")',
-        'neon-pink': '0 0 5px theme("colors.neon.pink"), 0 0 20px theme("colors.neon.pink")',
+        'vapor-glow': '0 0 10px theme("colors.vapor.purple"), 0 0 20px theme("colors.vapor.blue")',
+      },
+      backgroundImage: {
+        'vapor-gradient': 'linear-gradient(to right bottom, theme("colors.vapor.purple"), theme("colors.vapor.pink"), theme("colors.vapor.blue"))',
       },
       keyframes: {
         'crt-flicker': {
@@ -81,13 +84,23 @@ export default {
           '100%': { opacity: '0.97' },
         },
         'text-glow': {
-          '0%, 100%': { textShadow: '0 0 4px theme("colors.neon.cyan")' },
-          '50%': { textShadow: '0 0 20px theme("colors.neon.cyan"), 0 0 10px theme("colors.neon.purple")' },
+          '0%, 100%': { textShadow: '0 0 4px theme("colors.vapor.blue")' },
+          '50%': { textShadow: '0 0 15px theme("colors.vapor.pink"), 0 0 10px theme("colors.vapor.purple")' },
+        },
+        'vapor-drift': {
+          '0%, 100%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+        },
+        'border-pulse': {
+          '0%, 100%': { borderColor: 'theme("colors.vapor.purple")' },
+          '50%': { borderColor: 'theme("colors.vapor.blue")' },
         }
       },
       animation: {
         'crt-flicker': 'crt-flicker 0.15s infinite',
-        'text-glow': 'text-glow 2s ease-in-out infinite',
+        'text-glow': 'text-glow 3s ease-in-out infinite',
+        'vapor-drift': 'vapor-drift 10s linear infinite',
+        'border-pulse': 'border-pulse 4s ease infinite',
       }
     }
   },

@@ -33,40 +33,40 @@ export const Window: React.FC<WindowProps> = ({
     return (
         <div
             className={cn(
-                "flex flex-col min-w-[300px] flex-1 h-full transition-all duration-300 ease-in-out transform origin-center rounded-lg overflow-hidden",
-                // Active State: Neon Glow + Border
+                "flex flex-col min-w-[300px] flex-1 h-full transition-all duration-300 ease-in-out transform origin-center rounded-lg overflow-hidden relative",
+                // Active State: Dynamic Vapor Glow + Pulse Border
                 isActive
-                    ? "border border-neon-cyan/50 shadow-[0_0_15px_rgba(0,255,255,0.3)] z-10 scale-[1.002]"
-                    : "border border-white/10 opacity-90 scale-95 hover:opacity-100 hover:border-white/30",
-                "glass-panel", // Base glass effect from index.css
+                    ? "border-2 border-vapor-purple animate-border-pulse shadow-vapor-glow z-10 scale-[1.002]"
+                    : "border-2 border-white/10 opacity-90 scale-95 hover:opacity-100 hover:border-white/30",
+                "glass-panel",
                 className
             )}
             onClick={onFocus}
             style={style}
         >
-            {/* Title Bar */}
+            {/* Title Bar - Animated Vapor Gradient */}
             <div className={
                 cn(
-                    "window-title-bar flex items-center justify-between px-2 py-1.5 cursor-default select-none mb-0 transition-colors duration-300",
+                    "window-title-bar flex items-center justify-between px-2 py-1.5 cursor-default select-none mb-0 transition-all duration-300",
                     isActive
-                        ? "bg-gradient-to-r from-neon-purple/80 to-neon-cyan/80 text-white"
+                        ? "bg-vapor-gradient bg-[length:200%_200%] animate-gradient-shift text-black/80"
                         : "bg-black/40 text-gray-400"
                 )
             }>
-                <div className="flex items-center gap-2 font-bold text-sm tracking-wider uppercase animate-text-glow">
-                    <span className="text-xs">★</span>
+                <div className="flex items-center gap-2 font-bold text-sm tracking-wider uppercase">
+                    {isActive && <span className="text-xs animate-spin-slow">✿</span>}
                     <span>{title}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                    <button className="w-5 h-5 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors border border-white/5">
+                    <button className="w-5 h-5 rounded-full bg-black/10 hover:bg-black/20 flex items-center justify-center text-current transition-colors border border-black/5">
                         <Minus size={10} />
                     </button>
-                    <button className="w-5 h-5 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors border border-white/5">
+                    <button className="w-5 h-5 rounded-full bg-black/10 hover:bg-black/20 flex items-center justify-center text-current transition-colors border border-black/5">
                         <Square size={8} />
                     </button>
                     <button
                         onClick={onClose}
-                        className="w-5 h-5 rounded-full bg-white/10 hover:bg-red-500/80 flex items-center justify-center text-white transition-colors border border-white/5"
+                        className="w-5 h-5 rounded-full bg-black/10 hover:bg-rose-500/80 hover:text-white flex items-center justify-center text-current transition-colors border border-black/5"
                     >
                         <X size={10} />
                     </button>
@@ -74,7 +74,7 @@ export const Window: React.FC<WindowProps> = ({
             </div>
 
             {/* Content */}
-            <div className="flex-1 bg-black/60 backdrop-blur-md p-2 overflow-auto text-white/90">
+            <div className="flex-1 bg-black/60 backdrop-blur-md p-2 overflow-auto text-vapor-blue/90 selection:bg-vapor-pink selection:text-black">
                 {children}
             </div>
         </div>
