@@ -1,15 +1,7 @@
 import React from 'react';
 import { Monitor, Layout } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-export type Theme = 'retro' | 'cyberpunk' | 'vaporwave';
-
-export interface RiceConfigState {
-    gap: number;
-    theme: Theme;
-    showGlow: boolean;
-    showCrt: boolean;
-}
+import type { RiceConfigState } from '@/config';
 
 interface RiceConfigProps {
     config: RiceConfigState;

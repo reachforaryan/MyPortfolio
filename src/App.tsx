@@ -1,4 +1,11 @@
 import { useLocalStorage } from '@/hooks/use-local-storage';
+import {
+  type WindowId,
+  type WindowState,
+  type RiceConfigState,
+  INITIAL_WINDOWS,
+  INITIAL_RICE_CONFIG
+} from '@/config';
 
 import { Desktop } from '@/components/layout/Desktop';
 import { Taskbar } from '@/components/layout/Taskbar';
@@ -12,38 +19,14 @@ import { Projects } from '@/components/apps/Projects';
 import { Contact } from '@/components/apps/Contact';
 import { Terminal } from '@/components/apps/Terminal';
 import { HubExplorer } from '@/components/apps/HubExplorer';
-import { RiceConfig, type RiceConfigState } from '@/components/apps/RiceConfig';
+import { RiceConfig } from '@/components/apps/RiceConfig';
 import { MusicPlayer } from '@/components/apps/MusicPlayer';
-
-export type WindowId = 'about' | 'projects' | 'contact' | 'terminal' | 'hub' | 'rice' | 'music';
-
-interface WindowState {
-  id: WindowId;
-  title: string;
-  isOpen: boolean;
-  isMinimized: boolean;
-}
-
-const INITIAL_WINDOWS: Record<WindowId, WindowState> = {
-  about: { id: 'about', title: 'About Me', isOpen: true, isMinimized: false },
-  projects: { id: 'projects', title: 'Projects', isOpen: false, isMinimized: false },
-  contact: { id: 'contact', title: 'Contact', isOpen: false, isMinimized: false },
-  terminal: { id: 'terminal', title: 'Terminal', isOpen: false, isMinimized: false },
-  hub: { id: 'hub', title: 'Hub Explorer', isOpen: false, isMinimized: false },
-  rice: { id: 'rice', title: 'Rice Config', isOpen: false, isMinimized: false },
-  music: { id: 'music', title: 'VaporWaves', isOpen: false, isMinimized: false },
-};
 
 function App() {
   const [windows, setWindows] = useLocalStorage<Record<WindowId, WindowState>>('desktop:windows', INITIAL_WINDOWS);
   const [activeWindowId, setActiveWindowId] = useLocalStorage<WindowId | null>('desktop:activeWindowId', 'about');
   const [isHdBackground, setIsHdBackground] = useLocalStorage('desktop:isHdBackground', false);
-  const [riceConfig, setRiceConfig] = useLocalStorage<RiceConfigState>('desktop:riceConfig', {
-    gap: 16,
-    theme: 'retro',
-    showGlow: false,
-    showCrt: true,
-  });
+  const [riceConfig, setRiceConfig] = useLocalStorage<RiceConfigState>('desktop:riceConfig', INITIAL_RICE_CONFIG);
 
   const focusWindow = (id: WindowId) => {
     setActiveWindowId(id);
@@ -133,11 +116,6 @@ function App() {
           onClick={() => toggleWindow('hub')}
         />
         <DesktopIcon
-          label="Rice Config"
-          icon="https://win98icons.alexmeub.com/icons/png/settings_gear-4.png"
-          onClick={() => toggleWindow('rice')}
-        />
-        <DesktopIcon
           label="Music"
           icon="https://win98icons.alexmeub.com/icons/png/cd_audio_cd-1.png"
           onClick={() => toggleWindow('music')}
@@ -189,6 +167,8 @@ function App() {
         activeWindowId={activeWindowId}
         onToggleWindow={traverseWindow}
         onToggleTheme={() => setIsHdBackground(!isHdBackground)}
+        config={riceConfig}
+        onUpdateConfig={(updates) => setRiceConfig(prev => ({ ...prev, ...updates }))}
       />
     </Desktop>
   );

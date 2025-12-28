@@ -1,23 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { DESKTOP_PET_CONFIG } from '@/config';
 
-// Sprite configuration based on 32x32 grid
-const SPRITE_SHEET = '/sheep.png'; // Ensure this path is correct in your public folder
-const FRAME_WIDTH = 32;
-const FRAME_HEIGHT = 32;
-const WALK_FRAMES = 6;
-const IDLE_FRAMES = 4;
-const ANIMATION_SPEED = 150;
-
-// Movement configuration
-const MOVE_SPEED = 0.1; // Pixels per ms (0.1 is roughly 100px/sec)
-const IDLE_CHANCE = 0.005; // Slightly lower chance for more natural behavior
-
-const thoughts = ["No cap, nice wallpaper.", "Searching for grass...", "Is that a virus?", "404: Grass not found", "Can I eat your RAM?", "baaa.", "I'm watching you...", "Click me again!"];
+const {
+    SPRITE_SHEET,
+    FRAME_WIDTH,
+    FRAME_HEIGHT,
+    WALK_FRAMES,
+    IDLE_FRAMES,
+    ANIMATION_SPEED,
+    MOVE_SPEED,
+    IDLE_CHANCE,
+    JUMP_DISTANCE,
+    JUMP_HEIGHT,
+    JUMP_DURATION,
+    THOUGHTS
+} = DESKTOP_PET_CONFIG;
 
 export const DesktopPet: React.FC = () => {
     // Position and State
-    const [pos, setPos] = useState({ x: window.innerWidth / 2, targetX: window.innerWidth / 2 });
+    const [pos, setPos] = useState({ x: window.innerWidth / 2, targetX: window.innerWidth / 2, jumpY: 0 });
     const [isIdle, setIsIdle] = useState(true);
+    const [isJumping, setIsJumping] = useState(false);
     const [direction, setDirection] = useState<'left' | 'right'>('right');
     const [frame, setFrame] = useState(0);
     const [thought, setThought] = useState("");
@@ -25,15 +28,16 @@ export const DesktopPet: React.FC = () => {
 
     const lastUpdateRef = useRef(Date.now());
     const frameTimerRef = useRef(0);
+    const jumpRef = useRef({ progress: 0, startX: 0, targetX: 0 });
 
     const handlePetClick = () => {
         if (thought) return; // Don't spam
-        const randomThought = thoughts[Math.floor(Math.random() * thoughts.length)];
+        const randomThought = THOUGHTS[Math.floor(Math.random() * THOUGHTS.length)];
         setThought(randomThought);
         setTimeout(() => setThought(""), 3000);
 
-        // Also make it jump or pause? For now just talk.
-        setIsIdle(true); // Stop to talk
+        // Also make it jump on click sometimes? or just stop
+        setIsIdle(true);
     };
 
     useEffect(() => {
@@ -51,15 +55,65 @@ export const DesktopPet: React.FC = () => {
                     setFrame((prev) => (prev + 1) % IDLE_FRAMES);
                     frameTimerRef.current = 0;
                 }
+            } else if (isJumping) {
+                // 1. Progress the jump (0 to 1)
+                jumpRef.current.progress += delta / JUMP_DURATION;
+                const p = jumpRef.current.progress;
+
+                if (p >= 1) {
+                    // Landed
+                    setPos(prev => ({ ...prev, x: jumpRef.current.targetX, jumpY: 0 }));
+                    setIsJumping(false);
+                    setIsIdle(true);
+                    jumpRef.current.progress = 0;
+                    setFrame(0);
+                } else {
+                    // 2. Calculate X (Linear)
+                    const currentX = jumpRef.current.startX + (jumpRef.current.targetX - jumpRef.current.startX) * p;
+
+                    // 3. Calculate Y (Parabola: -4 * height * p * (1-p)) using specific JUMP_HEIGHT
+                    // This creates a smooth arc that starts and ends at 0
+                    const jumpY = -4 * JUMP_HEIGHT * p * (1 - p);
+
+                    setPos(prev => ({ ...prev, x: currentX, jumpY }));
+
+                    // Mid-air animation (walking fast or specific pose?)
+                    // Let's cycle walk frames faster in air?
+                    frameTimerRef.current += delta;
+                    if (frameTimerRef.current >= ANIMATION_SPEED / 2) {
+                        setFrame((prev) => (prev + 1) % WALK_FRAMES);
+                        frameTimerRef.current = 0;
+                    }
+                }
             } else if (isIdle) {
-                // 1. AI Decision: Should I move?
+                // 1. AI Decision: Should I move or jump?
                 // Only move if not thinking
-                if (!thought && Math.random() < IDLE_CHANCE) {
-                    const newTarget = Math.random() * (window.innerWidth - FRAME_WIDTH);
-                    setPos(prev => ({ ...prev, targetX: newTarget }));
-                    setDirection(newTarget > pos.x ? 'right' : 'left');
-                    setIsIdle(false);
-                    setFrame(0); // Reset animation to start of walk
+                if (!thought) {
+                    const r = Math.random();
+
+                    if (r < 0.002) {
+                        // JUMP!
+                        const jumpRight = Math.random() > 0.5; // Random direction for jump
+                        const jumpDist = jumpRight ? JUMP_DISTANCE : -JUMP_DISTANCE;
+                        const newTarget = Math.max(FRAME_WIDTH, Math.min(window.innerWidth - FRAME_WIDTH, pos.x + jumpDist));
+
+                        setDirection(jumpRight ? 'right' : 'left'); // Face correct way
+
+                        jumpRef.current = {
+                            progress: 0,
+                            startX: pos.x,
+                            targetX: newTarget
+                        };
+                        setIsJumping(true);
+                        setIsIdle(false);
+                    } else if (r < IDLE_CHANCE) {
+                        // WALK
+                        const newTarget = Math.random() * (window.innerWidth - FRAME_WIDTH);
+                        setPos(prev => ({ ...prev, targetX: newTarget }));
+                        setDirection(newTarget > pos.x ? 'right' : 'left');
+                        setIsIdle(false);
+                        setFrame(0);
+                    }
                 }
 
                 // Idle Animation Logic
@@ -69,9 +123,22 @@ export const DesktopPet: React.FC = () => {
                     frameTimerRef.current = 0;
                 }
             } else {
-                // 2. Movement Logic
+                // 2. Movement Logic (Walking)
                 const dist = pos.targetX - pos.x;
                 const moveDist = MOVE_SPEED * delta;
+
+                // Should we jump while walking?
+                if (Math.random() < 0.002 && Math.abs(dist) > JUMP_DISTANCE) {
+                    // Trigger jump in current direction
+                    const jumpRight = direction === 'right';
+                    const jumpDist = jumpRight ? JUMP_DISTANCE : -JUMP_DISTANCE;
+                    jumpRef.current = {
+                        progress: 0,
+                        startX: pos.x,
+                        targetX: Math.max(0, Math.min(window.innerWidth, pos.x + jumpDist))
+                    };
+                    setIsJumping(true);
+                }
 
                 if (Math.abs(dist) < moveDist) {
                     // Arrived at destination
@@ -96,14 +163,14 @@ export const DesktopPet: React.FC = () => {
 
         animationId = requestAnimationFrame(updateLoop);
         return () => cancelAnimationFrame(animationId);
-    }, [isIdle, pos.targetX, pos.x, thought, isHovered]); // Added isHovered dependency
+    }, [isIdle, isJumping, pos.targetX, pos.x, thought, isHovered, direction]);
 
     // --- Sprite Mapping Logic ---
     // Row 2: Walk Left, Row 3: Walk Right
     // Row 6: Idle Left, Row 7: Idle Right
     const getRow = () => {
         // If mouse is over sheep, use Idle rows (6 or 7) to look like sniffing
-        if (isHovered || isIdle) {
+        if ((isHovered || isIdle) && !isJumping) {
             return direction === 'right' ? 7 : 6;
         }
         return direction === 'right' ? 3 : 2;
@@ -114,11 +181,11 @@ export const DesktopPet: React.FC = () => {
 
     return (
         <div
-            className="fixed bottom-20 z-[40] transition-none" // Removed pointer-events-none from container to allow children events if needed, but safer to keep it and enable on child.
+            className="fixed bottom-20 z-[40] transition-none"
             style={{
                 left: `${pos.x}px`,
-                transform: `translateX(-50%)`, // Removing scale from container to handle bubble scaling separately or just apply to inner
-                width: 0, // Zero width container to avoid blocking clicks around it
+                transform: `translateX(-50%) translateY(${pos.jumpY}px)`, // Apply jumpY here
+                width: 0,
                 height: 0,
                 overflow: 'visible'
             }}
@@ -157,7 +224,7 @@ export const DesktopPet: React.FC = () => {
                         height: FRAME_HEIGHT,
                         backgroundImage: `url(${SPRITE_SHEET})`,
                         backgroundPosition: `${spriteX}px ${spriteY}px`,
-                        backgroundSize: `192px 256px`, // Total sheet size
+                        backgroundSize: `192px 256px`,
                         imageRendering: 'pixelated',
                     }}
                 />

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import type { WindowId } from '@/App';
+import type { WindowId, RiceConfigState } from '@/config';
 import { StartMenu } from './StartMenu';
 
 interface TaskbarProps {
@@ -8,9 +8,11 @@ interface TaskbarProps {
     activeWindowId?: WindowId | null;
     onToggleWindow?: (id: WindowId) => void;
     onToggleTheme?: () => void;
+    config?: RiceConfigState;
+    onUpdateConfig?: (updates: Partial<RiceConfigState>) => void;
 }
 
-export const Taskbar: React.FC<TaskbarProps> = ({ windows = [], activeWindowId, onToggleWindow, onToggleTheme }) => {
+export const Taskbar: React.FC<TaskbarProps> = ({ windows = [], activeWindowId, onToggleWindow, onToggleTheme, config, onUpdateConfig }) => {
     const [time, setTime] = useState(new Date());
     const [startOpen, setStartOpen] = useState(false);
 
@@ -21,7 +23,13 @@ export const Taskbar: React.FC<TaskbarProps> = ({ windows = [], activeWindowId, 
 
     return (
         <>
-            <StartMenu isOpen={startOpen} onClose={() => setStartOpen(false)} />
+            <StartMenu
+                isOpen={startOpen}
+                onClose={() => setStartOpen(false)}
+                onOpenWindow={onToggleWindow}
+                config={config}
+                onUpdateConfig={onUpdateConfig}
+            />
 
             <div className="fixed bottom-0 left-0 right-0 h-10 bg-black/60 backdrop-blur-md border-t border-white/20 shadow-lg flex items-center px-1 z-50">
                 <button
