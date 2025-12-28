@@ -13,8 +13,9 @@ import { Contact } from '@/components/apps/Contact';
 import { Terminal } from '@/components/apps/Terminal';
 import { HubExplorer } from '@/components/apps/HubExplorer';
 import { RiceConfig, type RiceConfigState } from '@/components/apps/RiceConfig';
+import { MusicPlayer } from '@/components/apps/MusicPlayer';
 
-export type WindowId = 'about' | 'projects' | 'contact' | 'terminal' | 'hub' | 'rice';
+export type WindowId = 'about' | 'projects' | 'contact' | 'terminal' | 'hub' | 'rice' | 'music';
 
 interface WindowState {
   id: WindowId;
@@ -30,6 +31,7 @@ const INITIAL_WINDOWS: Record<WindowId, WindowState> = {
   terminal: { id: 'terminal', title: 'Terminal', isOpen: false, isMinimized: false },
   hub: { id: 'hub', title: 'Hub Explorer', isOpen: false, isMinimized: false },
   rice: { id: 'rice', title: 'Rice Config', isOpen: false, isMinimized: false },
+  music: { id: 'music', title: 'VaporWaves', isOpen: false, isMinimized: false },
 };
 
 function App() {
@@ -91,6 +93,8 @@ function App() {
         return <HubExplorer />;
       case 'rice':
         return <RiceConfig config={riceConfig} onUpdate={(updates) => setRiceConfig(prev => ({ ...prev, ...updates }))} />;
+      case 'music':
+        return <MusicPlayer />;
       default:
         return null;
     }
@@ -132,6 +136,11 @@ function App() {
           label="Rice Config"
           icon="https://win98icons.alexmeub.com/icons/png/settings_gear-4.png"
           onClick={() => toggleWindow('rice')}
+        />
+        <DesktopIcon
+          label="Music"
+          icon="https://win98icons.alexmeub.com/icons/png/cd_audio_cd-1.png"
+          onClick={() => toggleWindow('music')}
         />
         <DesktopIcon
           label="Recycle Bin"
