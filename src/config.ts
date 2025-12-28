@@ -5,16 +5,17 @@ export interface WindowState {
     title: string;
     isOpen: boolean;
     isMinimized: boolean;
+    isMaximized?: boolean;
 }
 
 export const INITIAL_WINDOWS: Record<WindowId, WindowState> = {
-    about: { id: 'about', title: 'About Me', isOpen: true, isMinimized: false },
-    projects: { id: 'projects', title: 'Projects', isOpen: false, isMinimized: false },
-    contact: { id: 'contact', title: 'Contact', isOpen: false, isMinimized: false },
-    terminal: { id: 'terminal', title: 'Terminal', isOpen: false, isMinimized: false },
-    hub: { id: 'hub', title: 'Hub Explorer', isOpen: false, isMinimized: false },
-    rice: { id: 'rice', title: 'Rice Config', isOpen: false, isMinimized: false },
-    music: { id: 'music', title: 'VaporWaves', isOpen: false, isMinimized: false },
+    about: { id: 'about', title: 'About Me', isOpen: true, isMinimized: false, isMaximized: false },
+    projects: { id: 'projects', title: 'Projects', isOpen: false, isMinimized: false, isMaximized: false },
+    contact: { id: 'contact', title: 'Contact', isOpen: false, isMinimized: false, isMaximized: false },
+    terminal: { id: 'terminal', title: 'Terminal', isOpen: false, isMinimized: false, isMaximized: false },
+    hub: { id: 'hub', title: 'Hub Explorer', isOpen: false, isMinimized: false, isMaximized: false },
+    rice: { id: 'rice', title: 'Rice Config', isOpen: false, isMinimized: false, isMaximized: false },
+    music: { id: 'music', title: 'VaporWaves', isOpen: false, isMinimized: false, isMaximized: false },
 };
 
 export type Theme = 'retro' | 'cyberpunk' | 'vaporwave';

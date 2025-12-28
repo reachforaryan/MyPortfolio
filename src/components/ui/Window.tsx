@@ -12,6 +12,9 @@ interface WindowProps {
     children: React.ReactNode;
     isOpen: boolean;
     onClose: () => void;
+    onMinimize?: () => void;
+    onMaximize?: () => void;
+    isMaximized?: boolean;
     className?: string;
     isActive?: boolean;
     onFocus?: () => void;
@@ -23,6 +26,9 @@ export const Window: React.FC<WindowProps> = ({
     children,
     isOpen,
     onClose,
+    onMinimize,
+    onMaximize,
+    isMaximized,
     className,
     isActive,
     onFocus,
@@ -58,14 +64,20 @@ export const Window: React.FC<WindowProps> = ({
                     <span>{title}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                    <button className="w-5 h-5 rounded-full bg-black/10 hover:bg-black/20 flex items-center justify-center text-current transition-colors border border-black/5">
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onMinimize?.(); }}
+                        className="w-5 h-5 rounded-full bg-black/10 hover:bg-yellow-500/80 hover:text-white flex items-center justify-center text-current transition-colors border border-black/5"
+                    >
                         <Minus size={10} />
                     </button>
-                    <button className="w-5 h-5 rounded-full bg-black/10 hover:bg-black/20 flex items-center justify-center text-current transition-colors border border-black/5">
-                        <Square size={8} />
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onMaximize?.(); }}
+                        className="w-5 h-5 rounded-full bg-black/10 hover:bg-green-500/80 hover:text-white flex items-center justify-center text-current transition-colors border border-black/5"
+                    >
+                        <Square size={8} className={isMaximized ? "fill-current" : ""} />
                     </button>
                     <button
-                        onClick={onClose}
+                        onClick={(e) => { e.stopPropagation(); onClose(); }}
                         className="w-5 h-5 rounded-full bg-black/10 hover:bg-rose-500/80 hover:text-white flex items-center justify-center text-current transition-colors border border-black/5"
                     >
                         <X size={10} />

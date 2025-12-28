@@ -1,14 +1,20 @@
 import React, { useState, useRef, useEffect } from 'react';
+import type { WindowId, WindowState, RiceConfigState, Theme } from '@/config';
 
 interface TerminalProps {
     onOpenWindow: (id: string) => void;
+    onCloseWindow: (id: string) => void;
+    windows: Record<WindowId, WindowState>;
+    config: RiceConfigState;
+    onUpdateConfig: (newConfig: Partial<RiceConfigState>) => void;
 }
 
-export const Terminal: React.FC<TerminalProps> = ({ onOpenWindow }) => {
+export const Terminal: React.FC<TerminalProps> = ({ onOpenWindow, onCloseWindow, windows, config, onUpdateConfig }) => {
     const [history, setHistory] = useState<string[]>([
         "Microsoft(R) Windows 95",
         "   (C)Copyright Microsoft Corp 1981-1996.",
-        ""
+        "",
+        "Type 'help' for available commands."
     ]);
     const [input, setInput] = useState("");
     const inputRef = useRef<HTMLInputElement>(null);
@@ -26,28 +32,111 @@ export const Terminal: React.FC<TerminalProps> = ({ onOpenWindow }) => {
 
     const handleCommand = (e: React.FormEvent) => {
         e.preventDefault();
-        const cmd = input.trim().toLowerCase();
+        const rawCmd = input.trim();
+        const cmdParts = rawCmd.split(' ');
+        const cmd = cmdParts[0].toLowerCase();
+        const args = cmdParts.slice(1);
 
         let output: string[] = [`C:\\USERS\\GUEST> ${input}`];
 
         switch (cmd) {
             case 'help':
                 output.push("Available commands:");
-                output.push("  HELP     - Show this list");
-                output.push("  LS       - List applications");
-                output.push("  OPEN [name] - Open an application (e.g., 'open projects')");
-                output.push("  CLEAR    - Clear screen");
-                output.push("  WHOAMI   - Print current user");
+                output.push("  HELP                 - Show this list");
+                output.push("  LS / DIR             - List applications");
+                output.push("  OPEN [name]          - Open an application");
+                output.push("  CLOSE [name]         - Close an application");
+                output.push("  CONFIG               - View current configuration");
+                output.push("  SET [key] [value]    - Change config (theme, gap, glow, crt)");
+                output.push("  CLEAR / CLS          - Clear screen");
+                output.push("  WHOAMI               - Print current user");
                 break;
             case 'ls':
             case 'dir':
                 output.push(" Directory of C:\\USERS\\GUEST\\DESKTOP");
                 output.push("");
-                output.push("ABOUT          <DIR>");
-                output.push("PROJECTS       <DIR>");
-                output.push("CONTACT        <DIR>");
-                output.push("SKILLS.TXT     124 bytes");
+                Object.values(windows).forEach(win => {
+                    output.push(`${win.id.toUpperCase().padEnd(15)} <${win.isOpen ? 'OPEN' : 'CLOSED'}>  ${win.title}`);
+                });
                 output.push("");
+                break;
+            case 'open':
+                if (args.length === 0) {
+                    output.push("Usage: OPEN [application_name]");
+                } else {
+                    const target = args[0].toLowerCase();
+                    const winId = Object.keys(windows).find(k => k === target) as WindowId | undefined;
+
+                    if (winId) {
+                        if (!windows[winId].isOpen) {
+                            onOpenWindow(winId);
+                            output.push(`Opening ${winId}...`);
+                        } else {
+                            output.push(`${winId} is already open.`);
+                        }
+                    } else {
+                        output.push(`Application '${target}' not found.`);
+                    }
+                }
+                break;
+            case 'close':
+                if (args.length === 0) {
+                    output.push("Usage: CLOSE [application_name]");
+                } else {
+                    const target = args[0].toLowerCase();
+                    const winId = Object.keys(windows).find(k => k === target) as WindowId | undefined;
+
+                    if (winId) {
+                        if (windows[winId].isOpen) {
+                            onCloseWindow(winId);
+                            output.push(`Closing ${winId}...`);
+                        } else {
+                            output.push(`${winId} is not open.`);
+                        }
+                    } else {
+                        output.push(`Application '${target}' not found.`);
+                    }
+                }
+                break;
+            case 'config':
+                output.push("Current Configuration:");
+                output.push(JSON.stringify(config, null, 2));
+                break;
+            case 'set':
+                if (args.length < 2) {
+                    output.push("Usage: SET [key] [value]");
+                    output.push("Keys: theme, gap, glow, crt");
+                } else {
+                    const key = args[0].toLowerCase();
+                    const val = args[1].toLowerCase();
+
+                    if (key === 'theme') {
+                        if (['retro', 'cyberpunk', 'vaporwave'].includes(val)) {
+                            onUpdateConfig({ theme: val as Theme });
+                            output.push(`Theme set to ${val}`);
+                        } else {
+                            output.push("Invalid theme. Options: retro, cyberpunk, vaporwave");
+                        }
+                    } else if (key === 'gap') {
+                        const num = parseInt(val);
+                        if (!isNaN(num)) {
+                            onUpdateConfig({ gap: num });
+                            output.push(`Gap set to ${num}px`);
+                        } else {
+                            output.push("Invalid number for gap.");
+                        }
+                    } else if (key === 'glow') {
+                        const bool = val === 'true';
+                        onUpdateConfig({ showGlow: bool });
+                        output.push(`Glow effect ${bool ? 'enabled' : 'disabled'}`);
+                    } else if (key === 'crt') {
+                        const bool = val === 'true';
+                        onUpdateConfig({ showCrt: bool });
+                        output.push(`CRT effect ${bool ? 'enabled' : 'disabled'}`);
+                    } else {
+                        output.push(`Unknown config key: ${key}`);
+                    }
+                }
                 break;
             case 'whoami':
                 output.push("guest");
@@ -56,21 +145,11 @@ export const Terminal: React.FC<TerminalProps> = ({ onOpenWindow }) => {
             case 'cls':
                 setHistory([]);
                 setInput("");
-                return; // Early return to avoid adding history
+                return;
+            case '':
+                break;
             default:
-                if (cmd.startsWith('open ')) {
-                    const appName = cmd.replace('open ', '').trim();
-                    if (['about', 'projects', 'contact'].includes(appName)) {
-                        onOpenWindow(appName);
-                        output.push(`Opening ${appName}...`);
-                    } else {
-                        output.push(`Application '${appName}' not found.`);
-                    }
-                } else if (cmd === '') {
-                    // Do nothing for empty input
-                } else {
-                    output.push(`'${cmd}' is not recognized as an internal or external command.`);
-                }
+                output.push(`'${cmd}' is not recognized as an internal or external command.`);
                 break;
         }
 

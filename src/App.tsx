@@ -1,4 +1,5 @@
 import { useLocalStorage } from '@/hooks/use-local-storage';
+import { cn } from '@/lib/utils';
 import {
   type WindowId,
   type WindowState,
@@ -32,22 +33,33 @@ function App() {
     setActiveWindowId(id);
   };
 
-  const toggleWindow = (id: string) => {
+  const openWindow = (id: string) => {
     const winId = id as WindowId;
-    if (!windows[winId]) return; // Guard against invalid IDs from Terminal
+    if (!windows[winId]) return;
 
-    setWindows(prev => {
-      const isOpen = !prev[winId].isOpen;
-      return {
-        ...prev,
-        [winId]: {
-          ...prev[winId],
-          isOpen,
-          isMinimized: false
-        }
-      };
-    });
-    if (!windows[winId].isOpen) setActiveWindowId(winId);
+    setWindows(prev => ({
+      ...prev,
+      [winId]: {
+        ...prev[winId],
+        isOpen: true,
+        isMinimized: false
+      }
+    }));
+    setActiveWindowId(winId);
+  };
+
+  const closeWindow = (id: string) => {
+    const winId = id as WindowId;
+    if (!windows[winId]) return;
+
+    setWindows(prev => ({
+      ...prev,
+      [winId]: {
+        ...prev[winId],
+        isOpen: false,
+        isMinimized: false
+      }
+    }));
   };
 
   const traverseWindow = (id: WindowId) => {
@@ -62,6 +74,17 @@ function App() {
     if (!windows[id].isMinimized) setActiveWindowId(id);
   };
 
+  const toggleMaximize = (id: WindowId) => {
+    setWindows(prev => ({
+      ...prev,
+      [id]: {
+        ...prev[id],
+        isMaximized: !prev[id].isMaximized
+      }
+    }));
+    setActiveWindowId(id);
+  };
+
   const renderWindowContent = (id: WindowId) => {
     switch (id) {
       case 'about':
@@ -71,7 +94,13 @@ function App() {
       case 'contact':
         return <Contact />;
       case 'terminal':
-        return <Terminal onOpenWindow={toggleWindow} />;
+        return <Terminal
+          onOpenWindow={openWindow}
+          onCloseWindow={closeWindow}
+          windows={windows}
+          config={riceConfig}
+          onUpdateConfig={(updates) => setRiceConfig(prev => ({ ...prev, ...updates }))}
+        />;
       case 'hub':
         return <HubExplorer />;
       case 'rice':
@@ -93,32 +122,32 @@ function App() {
         <DesktopIcon
           label="About Me"
           icon="https://win98icons.alexmeub.com/icons/png/computer_explorer-5.png"
-          onClick={() => toggleWindow('about')}
+          onClick={() => openWindow('about')}
         />
         <DesktopIcon
           label="Projects"
           icon="https://win98icons.alexmeub.com/icons/png/directory_closed-4.png"
-          onClick={() => toggleWindow('projects')}
+          onClick={() => openWindow('projects')}
         />
         <DesktopIcon
           label="Contact"
           icon="https://win98icons.alexmeub.com/icons/png/envelope_closed-0.png"
-          onClick={() => toggleWindow('contact')}
+          onClick={() => openWindow('contact')}
         />
         <DesktopIcon
           label="Terminal"
           icon="https://win98icons.alexmeub.com/icons/png/console_prompt-0.png"
-          onClick={() => toggleWindow('terminal')}
+          onClick={() => openWindow('terminal')}
         />
         <DesktopIcon
           label="GitHub"
           icon="/github.png"
-          onClick={() => toggleWindow('hub')}
+          onClick={() => openWindow('hub')}
         />
         <DesktopIcon
           label="Music"
           icon="https://win98icons.alexmeub.com/icons/png/cd_audio_cd-1.png"
-          onClick={() => toggleWindow('music')}
+          onClick={() => openWindow('music')}
         />
 
       </div>
@@ -142,10 +171,16 @@ function App() {
             key={win.id}
             title={win.title}
             isOpen={true}
-            onClose={() => toggleWindow(win.id)}
+            onClose={() => closeWindow(win.id)}
+            onMinimize={() => traverseWindow(win.id as WindowId)}
+            onMaximize={() => toggleMaximize(win.id as WindowId)}
+            isMaximized={win.isMaximized}
             isActive={activeWindowId === win.id}
             onFocus={() => focusWindow(win.id)}
-            className="w-full h-full transition-all duration-300 min-h-0"
+            className={cn(
+              "w-full h-full transition-all duration-300 min-h-0",
+              win.isMaximized ? "fixed inset-0 z-50 rounded-none !w-screen !h-screen" : ""
+            )}
             style={{
               borderColor: riceConfig.theme === 'cyberpunk' ? '#facc15' : riceConfig.theme === 'vaporwave' ? '#f472b6' : undefined,
               boxShadow: riceConfig.showGlow
