@@ -7,6 +7,8 @@ interface DesktopProps {
     enableCrt?: boolean;
 }
 
+import { DesktopPet } from '../ui/DesktopPet';
+
 export const Desktop: React.FC<DesktopProps> = ({ children, backgroundImage, enableCrt = true }) => {
     return (
         <div
@@ -17,6 +19,7 @@ export const Desktop: React.FC<DesktopProps> = ({ children, backgroundImage, ena
             )}
             style={backgroundImage ? { backgroundImage: `url(${backgroundImage})` } : undefined}
         >
+            <DesktopPet />
             {/* CRT Flicker Overlay */}
             {enableCrt && (
                 <div className="absolute inset-0 bg-white/5 pointer-events-none z-[100] animate-crt-flicker mix-blend-overlay" />

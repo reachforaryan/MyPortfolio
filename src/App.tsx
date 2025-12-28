@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useLocalStorage } from '@/hooks/use-local-storage';
 
 import { Desktop } from '@/components/layout/Desktop';
 import { Taskbar } from '@/components/layout/Taskbar';
@@ -35,10 +35,10 @@ const INITIAL_WINDOWS: Record<WindowId, WindowState> = {
 };
 
 function App() {
-  const [windows, setWindows] = useState<Record<WindowId, WindowState>>(INITIAL_WINDOWS);
-  const [activeWindowId, setActiveWindowId] = useState<WindowId | null>('about');
-  const [isHdBackground, setIsHdBackground] = useState(false);
-  const [riceConfig, setRiceConfig] = useState<RiceConfigState>({
+  const [windows, setWindows] = useLocalStorage<Record<WindowId, WindowState>>('desktop:windows', INITIAL_WINDOWS);
+  const [activeWindowId, setActiveWindowId] = useLocalStorage<WindowId | null>('desktop:activeWindowId', 'about');
+  const [isHdBackground, setIsHdBackground] = useLocalStorage('desktop:isHdBackground', false);
+  const [riceConfig, setRiceConfig] = useLocalStorage<RiceConfigState>('desktop:riceConfig', {
     gap: 16,
     theme: 'retro',
     showGlow: false,
@@ -106,7 +106,7 @@ function App() {
   return (
     <Desktop backgroundImage={isHdBackground ? hdBackground : undefined} enableCrt={riceConfig.showCrt}>
       {/* Sidebar - Persistent Desktop Icons (Stage Manager) */}
-      <div className="flex flex-col gap-6 w-[100px] h-full pt-4">
+      <div className="flex flex-col flex-wrap gap-x-2 gap-y-6 h-full pt-4 content-start w-auto max-w-[50vw]">
         <DesktopIcon
           label="About Me"
           icon="https://win98icons.alexmeub.com/icons/png/computer_explorer-5.png"
@@ -129,7 +129,7 @@ function App() {
         />
         <DesktopIcon
           label="GitHub"
-          icon="https://win98icons.alexmeub.com/icons/png/msn_zones-0.png" // Using a placeholder icon for GitHub
+          icon="/github.png"
           onClick={() => toggleWindow('hub')}
         />
         <DesktopIcon
