@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Send, Mail, MessageSquare } from 'lucide-react';
+import { Send, Mail } from 'lucide-react';
 
 export const Contact: React.FC = () => {
     return (

@@ -58,3 +58,27 @@ export const DESKTOP_PET_CONFIG = {
         "Boing!"
     ]
 };
+
+export const ABOUT_ME_CONFIG = {
+    GREETING: "Aryan Singh",
+    AVATAR_URL: "https://win98icons.alexmeub.com/icons/png/computer_explorer-5.png",
+    TITLE: "Computer Science Undergrad @ VIT Vellore | OCI Certified GenAI Professional",
+    BIO: "I am a Digital Artisan building software that feels alive. I bridge the gap between complex AI research and high-performance user experiences, focusing on systems that can see, reason, and adapt.",
+    AI_FOCUS: [
+        { title: "Agentic Frameworks", description: "Crafting collaborative AI workflows." },
+        { title: "Visual Intelligence", description: "Developing models that understand human sentiment." },
+        { title: "Healthcare AI", description: "Applying deep learning to biomedical signal analysis." }
+    ],
+    STACK: {
+        logic: ["Python", "Java", "SQL"],
+        intelligence: ["PyTorch", "Transformers", "LangChain", "CrewAI"],
+        interface: ["React", "TypeScript", "Tailwind CSS"],
+        cloud: ["Oracle Cloud (OCI)", "Azure", "AWS"]
+    },
+    SOCIAL_LINKS: [
+        { label: "GitHub", url: "https://github.com/reachforaryan" },
+        { label: "LinkedIn", url: "https://linkedin.com/in/reachforaryan" },
+        { label: "Email", url: "mailto:reachforaryan@gmail.com" }
+    ],
+    QUOTE: "\"Design is not just what it looks like and feels like. Design is how it works.\""
+};
