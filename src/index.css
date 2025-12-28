@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -49,7 +51,44 @@
   }
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&display=swap');
+@layer utilities {
+  @keyframes scanline {
+    0% {
+      background-position: 0 0;
+    }
+
+    100% {
+      background-position: 0 4px;
+    }
+  }
+
+  .scanlines {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .scanlines::before {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(to bottom,
+        rgba(18, 16, 16, 0) 50%,
+        rgba(0, 0, 0, 0.25) 50%);
+    background-size: 100% 4px;
+    z-index: 100;
+    pointer-events: none;
+    animation: scanline 0.5s linear infinite;
+  }
+
+  .glass-panel {
+    @apply bg-white/10 backdrop-blur-md border border-white/20 shadow-xl;
+  }
+}
+
 
 @layer base {
   * {
@@ -59,5 +98,7 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'Pixelify Sans', 'Courier New', Courier, monospace;
+    overflow: hidden;
+    /* Prevent body scroll for desktop app feel */
   }
 }

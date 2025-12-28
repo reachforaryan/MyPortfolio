@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Folder, FileText, ArrowLeft, RefreshCw, Star, GitFork } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { useState, useEffect } from 'react';
+import { Folder, RefreshCw, Star, GitFork } from 'lucide-react';
 
 // Types for GitHub API
 interface Repo {
@@ -15,7 +14,7 @@ interface Repo {
 const GITHUB_USERNAME = 'reachforaryan'; // Default placeholder
 
 export const HubExplorer = () => {
-    const [currentPath, setCurrentPath] = useState<string>(`C:\\GITHUB\\${GITHUB_USERNAME.toUpperCase()}`);
+    const [currentPath] = useState<string>(`C:\\GITHUB\\${GITHUB_USERNAME.toUpperCase()}`);
     const [repos, setRepos] = useState<Repo[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);

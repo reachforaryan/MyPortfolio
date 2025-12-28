@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { cn } from '@/lib/utils';
+
 import { Desktop } from '@/components/layout/Desktop';
 import { Taskbar } from '@/components/layout/Taskbar';
 import { Window } from '@/components/ui/Window';
@@ -140,69 +140,38 @@ function App() {
       </div>
 
       {/* Workspace - Tiling Area */}
+      {/* Workspace - Grid Area */}
       <div
-        className="flex-1 flex overflow-hidden h-full transition-all duration-300"
-        style={{ gap: `${riceConfig.gap}px` }}
+        className="flex-1 grid overflow-hidden h-full transition-all duration-300"
+        style={{
+          gap: `${riceConfig.gap}px`,
+          gridTemplateColumns: visibleWindows.length > 0
+            ? `repeat(${Math.ceil(Math.sqrt(visibleWindows.length))}, minmax(0, 1fr))`
+            : '1fr',
+          gridTemplateRows: visibleWindows.length > 0
+            ? `repeat(${Math.ceil(visibleWindows.length / Math.ceil(Math.sqrt(visibleWindows.length)))}, minmax(0, 1fr))`
+            : '1fr'
+        }}
       >
-        {visibleWindows.length > 0 && (
-          <>
-            {/* Master Column (First Window) */}
-            <div
-              className={cn(
-                "flex flex-col h-full transition-all duration-300",
-                visibleWindows.length > 1 ? "w-1/2" : "w-full"
-              )}
-              style={{ gap: `${riceConfig.gap}px` }}
-            >
-              <Window
-                key={visibleWindows[0].id}
-                title={visibleWindows[0].title}
-                isOpen={true}
-                onClose={() => toggleWindow(visibleWindows[0].id)}
-                isActive={activeWindowId === visibleWindows[0].id}
-                onFocus={() => focusWindow(visibleWindows[0].id)}
-                className="h-full transition-all duration-300"
-                style={{
-                  borderColor: riceConfig.theme === 'cyberpunk' ? '#facc15' : riceConfig.theme === 'vaporwave' ? '#f472b6' : undefined,
-                  boxShadow: riceConfig.showGlow
-                    ? (riceConfig.theme === 'cyberpunk' ? '0 0 15px #facc15' : '0 0 15px #f472b6')
-                    : undefined
-                }}
-              >
-                {/* Content Logic */}
-                {renderWindowContent(visibleWindows[0].id)}
-              </Window>
-            </div>
-
-            {/* Stack Column (Remaining Windows) */}
-            {visibleWindows.length > 1 && (
-              <div
-                className="flex flex-col h-full w-1/2 transition-all duration-300"
-                style={{ gap: `${riceConfig.gap}px` }}
-              >
-                {visibleWindows.slice(1).map(win => (
-                  <Window
-                    key={win.id}
-                    title={win.title}
-                    isOpen={true}
-                    onClose={() => toggleWindow(win.id)}
-                    isActive={activeWindowId === win.id}
-                    onFocus={() => focusWindow(win.id)}
-                    className="h-auto min-h-0 transition-all duration-300"
-                    style={{
-                      borderColor: riceConfig.theme === 'cyberpunk' ? '#facc15' : riceConfig.theme === 'vaporwave' ? '#f472b6' : undefined,
-                      boxShadow: riceConfig.showGlow
-                        ? (riceConfig.theme === 'cyberpunk' ? '0 0 15px #facc15' : '0 0 15px #f472b6')
-                        : undefined
-                    }}
-                  >
-                    {renderWindowContent(win.id)}
-                  </Window>
-                ))}
-              </div>
-            )}
-          </>
-        )}
+        {visibleWindows.map((win) => (
+          <Window
+            key={win.id}
+            title={win.title}
+            isOpen={true}
+            onClose={() => toggleWindow(win.id)}
+            isActive={activeWindowId === win.id}
+            onFocus={() => focusWindow(win.id)}
+            className="w-full h-full transition-all duration-300 min-h-0"
+            style={{
+              borderColor: riceConfig.theme === 'cyberpunk' ? '#facc15' : riceConfig.theme === 'vaporwave' ? '#f472b6' : undefined,
+              boxShadow: riceConfig.showGlow
+                ? (riceConfig.theme === 'cyberpunk' ? '0 0 15px #facc15' : '0 0 15px #f472b6')
+                : undefined
+            }}
+          >
+            {renderWindowContent(win.id)}
+          </Window>
+        ))}
       </div>
 
       <Taskbar

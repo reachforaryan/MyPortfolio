@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sliders, Monitor, Layout } from 'lucide-react';
+import {Monitor, Layout } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export type Theme = 'retro' | 'cyberpunk' | 'vaporwave';

@@ -10,11 +10,14 @@ export const Desktop: React.FC<DesktopProps> = ({ children, backgroundImage }) =
     return (
         <div
             className={cn(
-                "h-screen w-full relative overflow-hidden font-sans text-retro-black selection:bg-retro-blue selection:text-white flex flex-row gap-4 p-4 items-stretch pb-14",
+                "h-screen w-full relative overflow-hidden font-sans text-retro-black selection:bg-retro-blue selection:text-white flex flex-row gap-4 p-4 items-stretch pb-14 scanlines",
                 backgroundImage ? "bg-cover bg-center" : "bg-retro-teal"
             )}
             style={backgroundImage ? { backgroundImage: `url(${backgroundImage})` } : undefined}
         >
+            {/* CRT Flicker Overlay */}
+            <div className="absolute inset-0 bg-white/5 pointer-events-none z-[100] animate-crt-flicker mix-blend-overlay" />
+
             {children}
             {/* Dark overlay for better text readability on HD images if needed */}
             {backgroundImage && (

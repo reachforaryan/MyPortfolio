@@ -23,20 +23,20 @@ export const Taskbar: React.FC<TaskbarProps> = ({ windows = [], activeWindowId, 
         <>
             <StartMenu isOpen={startOpen} onClose={() => setStartOpen(false)} />
 
-            <div className="fixed bottom-0 left-0 right-0 h-10 bg-retro-gray border-t-2 border-retro-white shadow-retro flex items-center px-1 z-50">
+            <div className="fixed bottom-0 left-0 right-0 h-10 bg-black/60 backdrop-blur-md border-t border-white/20 shadow-lg flex items-center px-1 z-50">
                 <button
                     className={cn(
-                        "flex items-center gap-1 px-2 py-1 bg-retro-gray font-bold text-sm mr-2 select-none",
+                        "flex items-center gap-2 px-3 py-1 bg-white/5 hover:bg-white/10 font-bold text-sm mr-2 select-none text-white rounded transaction-colors duration-200 border border-white/5",
                         startOpen
-                            ? "shadow-retro-in border-dotted border-[1.5px] border-black active:shadow-retro-in"
-                            : "shadow-retro active:shadow-retro-in"
+                            ? "bg-neon-pink/20 border-neon-pink/50 text-neon-pink shadow-[0_0_10px_rgba(255,0,255,0.3)]"
+                            : "shadow-sm active:translate-y-[1px]"
                     )}
                     onClick={() => setStartOpen(!startOpen)}
                 >
                     <img
                         src="https://win98icons.alexmeub.com/icons/png/windows-0.png"
                         alt="Start"
-                        className="w-5 h-5"
+                        className="w-5 h-5 drop-shadow-[0_0_5px_rgba(255,255,255,0.5)]"
                     />
                     Start
                 </button>
@@ -46,10 +46,10 @@ export const Taskbar: React.FC<TaskbarProps> = ({ windows = [], activeWindowId, 
                         <button
                             key={win.id}
                             className={cn(
-                                "flex items-center gap-2 px-2 py-1 min-w-[150px] max-w-[200px] text-left truncate text-sm select-none",
+                                "flex items-center gap-2 px-3 py-1 min-w-[150px] max-w-[200px] text-left truncate text-sm select-none rounded transition-all duration-200 border border-transparent",
                                 activeWindowId === win.id && !win.isMinimized
-                                    ? "bg-retro-gray-light shadow-retro-in font-bold border-dotted border-[1.5px] border-black" // Active
-                                    : "bg-retro-gray shadow-retro active:shadow-retro-in" // Inactive
+                                    ? "bg-white/10 text-neon-cyan border-white/10 shadow-[0_0_10px_rgba(0,255,255,0.2)] font-semibold" // Active
+                                    : "bg-transparent text-gray-300 hover:bg-white/5 hover:text-white" // Inactive
                             )}
                             onClick={() => onToggleWindow && onToggleWindow(win.id)}
                         >
@@ -59,25 +59,25 @@ export const Taskbar: React.FC<TaskbarProps> = ({ windows = [], activeWindowId, 
                                         win.id === 'projects' ? "https://win98icons.alexmeub.com/icons/png/directory_closed-4.png" :
                                             "https://win98icons.alexmeub.com/icons/png/envelope_closed-0.png"
                                 }
-                                className="w-4 h-4"
+                                className="w-4 h-4 drop-shadow-[0_0_4px_rgba(255,255,255,0.3)]"
                             />
                             <span className="truncate">{win.title}</span>
                         </button>
                     ))}
                 </div>
 
-                <div className="px-3 py-1 bg-retro-gray shadow-retro-in text-xs flex items-center gap-2 cursor-default select-none">
+                <div className="px-3 py-1 bg-white/5 rounded text-xs flex items-center gap-2 cursor-default select-none text-gray-300 border border-white/5">
                     {/* Theme Toggle Button */}
                     <button
                         onClick={onToggleTheme}
-                        className="hover:bg-retro-blue/20 p-0.5 rounded cursor-pointer active:translate-y-[1px]"
+                        className="hover:bg-white/10 p-1 rounded-sm cursor-pointer active:translate-y-[1px] transition-colors"
                         title="Toggle Background"
                     >
-                        <img src="https://win98icons.alexmeub.com/icons/png/display_properties-3.png" className="w-4 h-4" alt="Theme" />
+                        <img src="https://win98icons.alexmeub.com/icons/png/display_properties-3.png" className="w-4 h-4 invert opacity-80" alt="Theme" />
                     </button>
-                    <div className="w-[1px] h-4 bg-retro-dark-gray mx-1" />
-                    <img src="https://win98icons.alexmeub.com/icons/png/audio_std-0.png" className="w-4 h-4" />
-                    <span>{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    <div className="w-[1px] h-4 bg-white/20 mx-1" />
+                    <img src="https://win98icons.alexmeub.com/icons/png/audio_std-0.png" className="w-4 h-4 invert opacity-80" />
+                    <span className="font-mono">{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                 </div>
             </div>
         </>
