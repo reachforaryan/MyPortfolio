@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { cn } from '@/lib/utils';
@@ -25,8 +25,10 @@ import { HubExplorer } from '@/components/apps/HubExplorer';
 import { RiceConfig } from '@/components/apps/RiceConfig';
 import { MusicPlayer } from '@/components/apps/MusicPlayer';
 import { Blog } from '@/components/apps/Blog';
+import { SystemBootLoader } from '@/components/layout/SystemBootLoader';
 
 function App() {
+  const [isBooting, setIsBooting] = useState(() => !sessionStorage.getItem('booted'));
   const [windows, setWindows] = useLocalStorage<Record<WindowId, WindowState>>('desktop:windows', INITIAL_WINDOWS);
   const [activeWindowId, setActiveWindowId] = useLocalStorage<WindowId | null>('desktop:activeWindowId', 'about');
   const [isHdBackground, setIsHdBackground] = useLocalStorage('desktop:isHdBackground', true);
@@ -36,6 +38,7 @@ function App() {
   // Hydrate windows state with any new apps that might have been added to config (like Blog)
   // but aren't in the user's localStorage yet.
   useEffect(() => {
+    // Only run this if not booting, although running it while booting is fine too.
     const missingKeys = Object.keys(INITIAL_WINDOWS).filter(key => !windows[key as WindowId]);
     if (missingKeys.length > 0) {
       setWindows(prev => ({
@@ -134,106 +137,115 @@ function App() {
   const visibleWindows = Object.values(windows).filter(w => w.isOpen && !w.isMinimized);
 
   return (
-    <Desktop backgroundImage={isHdBackground ? hdBackground : undefined} enableCrt={riceConfig.showCrt}>
-      {/* Sidebar - Persistent Desktop Icons (Stage Manager) */}
-      <div className={cn(
-        "flex gap-x-2 gap-y-2 md:gap-y-6 pt-4 content-start transition-all duration-300",
-        isMobile
-          ? "w-full flex-row overflow-x-auto h-auto pb-2 shrink-0 items-center px-2"
-          : "flex-col flex-wrap h-full w-auto max-w-[50vw]"
-      )}>
-        <DesktopIcon
-          label="About Me"
-          icon="https://win98icons.alexmeub.com/icons/png/computer_explorer-5.png"
-          onClick={() => openWindow('about')}
-        />
-        <DesktopIcon
-          label="Projects"
-          icon="https://win98icons.alexmeub.com/icons/png/directory_closed-4.png"
-          onClick={() => openWindow('projects')}
-        />
-        <DesktopIcon
-          label="Contact"
-          icon="https://win98icons.alexmeub.com/icons/png/envelope_closed-0.png"
-          onClick={() => openWindow('contact')}
-        />
-        <DesktopIcon
-          label="Terminal"
-          icon="https://win98icons.alexmeub.com/icons/png/console_prompt-0.png"
-          onClick={() => openWindow('terminal')}
-        />
-        <DesktopIcon
-          label="GitHub"
-          icon="/github.png"
-          onClick={() => openWindow('hub')}
-        />
-        <DesktopIcon
-          label="Music"
-          icon="https://win98icons.alexmeub.com/icons/png/cd_audio_cd-1.png"
-          onClick={() => openWindow('music')}
-        />
-        <DesktopIcon
-          label="My Blog"
-          icon="https://win98icons.alexmeub.com/icons/png/notepad-0.png"
-          onClick={() => openWindow('blog')}
-        />
+    <>
+      {isBooting ? (
+        <SystemBootLoader onComplete={() => {
+          setIsBooting(false);
+          sessionStorage.setItem('booted', 'true');
+        }} />
+      ) : (
+        <Desktop backgroundImage={isHdBackground ? hdBackground : undefined} enableCrt={riceConfig.showCrt}>
+          {/* Sidebar - Persistent Desktop Icons (Stage Manager) */}
+          <div className={cn(
+            "flex gap-x-2 gap-y-2 md:gap-y-6 pt-4 content-start transition-all duration-300",
+            isMobile
+              ? "w-full flex-row overflow-x-auto h-auto pb-2 shrink-0 items-center px-2"
+              : "flex-col flex-wrap h-full w-auto max-w-[50vw]"
+          )}>
+            <DesktopIcon
+              label="About Me"
+              icon="https://win98icons.alexmeub.com/icons/png/computer_explorer-5.png"
+              onClick={() => openWindow('about')}
+            />
+            <DesktopIcon
+              label="Projects"
+              icon="https://win98icons.alexmeub.com/icons/png/directory_closed-4.png"
+              onClick={() => openWindow('projects')}
+            />
+            <DesktopIcon
+              label="Contact"
+              icon="https://win98icons.alexmeub.com/icons/png/envelope_closed-0.png"
+              onClick={() => openWindow('contact')}
+            />
+            <DesktopIcon
+              label="Terminal"
+              icon="https://win98icons.alexmeub.com/icons/png/console_prompt-0.png"
+              onClick={() => openWindow('terminal')}
+            />
+            <DesktopIcon
+              label="GitHub"
+              icon="/github.png"
+              onClick={() => openWindow('hub')}
+            />
+            <DesktopIcon
+              label="Music"
+              icon="https://win98icons.alexmeub.com/icons/png/cd_audio_cd-1.png"
+              onClick={() => openWindow('music')}
+            />
+            <DesktopIcon
+              label="My Blog"
+              icon="https://win98icons.alexmeub.com/icons/png/notepad-0.png"
+              onClick={() => openWindow('blog')}
+            />
 
-      </div>
+          </div>
 
-      {/* Workspace - Tiling Area */}
-      {/* Workspace - Grid Area */}
-      <div
-        className="flex-1 grid overflow-hidden h-full transition-all duration-300"
-        style={{
-          gap: `${riceConfig.gap}px`,
-          gridTemplateColumns: isMobile
-            ? '1fr' // Mobile: Single column
-            : visibleWindows.length > 0
-              ? `repeat(${Math.ceil(Math.sqrt(visibleWindows.length))}, minmax(0, 1fr))`
-              : '1fr',
-          gridTemplateRows: isMobile
-            ? `repeat(${visibleWindows.length}, minmax(0, 1fr))` // Mobile: Stack windows vertically
-            : visibleWindows.length > 0
-              ? `repeat(${Math.ceil(visibleWindows.length / Math.ceil(Math.sqrt(visibleWindows.length)))}, minmax(0, 1fr))`
-              : '1fr'
-        }}
-      >
-        {visibleWindows.map((win) => (
-          <Window
-            key={win.id}
-            title={win.title}
-            isOpen={true}
-            onClose={() => closeWindow(win.id)}
-            onMinimize={() => traverseWindow(win.id as WindowId)}
-            onMaximize={() => toggleMaximize(win.id as WindowId)}
-            isMaximized={win.isMaximized}
-            isActive={activeWindowId === win.id}
-            onFocus={() => focusWindow(win.id)}
-            className={cn(
-              "w-full h-full transition-all duration-300 min-h-0",
-              win.isMaximized ? "fixed inset-0 z-50 rounded-none !w-screen !h-screen" : ""
-            )}
+          {/* Workspace - Tiling Area */}
+          {/* Workspace - Grid Area */}
+          <div
+            className="flex-1 grid overflow-hidden h-full transition-all duration-300"
             style={{
-              borderColor: riceConfig.theme === 'cyberpunk' ? '#facc15' : riceConfig.theme === 'vaporwave' ? '#f472b6' : undefined,
-              boxShadow: riceConfig.showGlow
-                ? (riceConfig.theme === 'cyberpunk' ? '0 0 15px #facc15' : '0 0 15px #f472b6')
-                : undefined
+              gap: `${riceConfig.gap}px`,
+              gridTemplateColumns: isMobile
+                ? '1fr' // Mobile: Single column
+                : visibleWindows.length > 0
+                  ? `repeat(${Math.ceil(Math.sqrt(visibleWindows.length))}, minmax(0, 1fr))`
+                  : '1fr',
+              gridTemplateRows: isMobile
+                ? `repeat(${visibleWindows.length}, minmax(0, 1fr))` // Mobile: Stack windows vertically
+                : visibleWindows.length > 0
+                  ? `repeat(${Math.ceil(visibleWindows.length / Math.ceil(Math.sqrt(visibleWindows.length)))}, minmax(0, 1fr))`
+                  : '1fr'
             }}
           >
-            {renderWindowContent(win.id)}
-          </Window>
-        ))}
-      </div>
+            {visibleWindows.map((win) => (
+              <Window
+                key={win.id}
+                title={win.title}
+                isOpen={true}
+                onClose={() => closeWindow(win.id)}
+                onMinimize={() => traverseWindow(win.id as WindowId)}
+                onMaximize={() => toggleMaximize(win.id as WindowId)}
+                isMaximized={win.isMaximized}
+                isActive={activeWindowId === win.id}
+                onFocus={() => focusWindow(win.id)}
+                className={cn(
+                  "w-full h-full transition-all duration-300 min-h-0",
+                  win.isMaximized ? "fixed inset-0 z-50 rounded-none !w-screen !h-screen" : ""
+                )}
+                style={{
+                  borderColor: riceConfig.theme === 'cyberpunk' ? '#facc15' : riceConfig.theme === 'vaporwave' ? '#f472b6' : undefined,
+                  boxShadow: riceConfig.showGlow
+                    ? (riceConfig.theme === 'cyberpunk' ? '0 0 15px #facc15' : '0 0 15px #f472b6')
+                    : undefined
+                }}
+              >
+                {renderWindowContent(win.id)}
+              </Window>
+            ))}
+          </div>
 
-      <Taskbar
-        windows={Object.values(windows).filter(w => w.isOpen)}
-        activeWindowId={activeWindowId}
-        onToggleWindow={traverseWindow}
-        onToggleTheme={() => setIsHdBackground(!isHdBackground)}
-        config={riceConfig}
-        onUpdateConfig={(updates) => setRiceConfig(prev => ({ ...prev, ...updates }))}
-      />
-    </Desktop>
+          <Taskbar
+            windows={Object.values(windows).filter(w => w.isOpen)}
+            activeWindowId={activeWindowId}
+            onToggleWindow={traverseWindow}
+            onToggleTheme={() => setIsHdBackground(!isHdBackground)}
+            config={riceConfig}
+            onUpdateConfig={(updates) => setRiceConfig(prev => ({ ...prev, ...updates }))}
+          />
+        </Desktop>
+      )}
+    </>
   );
 }
 

@@ -94,7 +94,11 @@ export const StartMenu: React.FC<StartMenuProps> = ({ isOpen, onClose, onOpenWin
                     <div className="h-[1px] bg-retro-gray-dark border-b border-white my-1" />
                     <button
                         className="w-full text-left px-2 py-2 hover:bg-retro-blue hover:text-white flex items-center gap-2 group text-sm border border-transparent"
-                        onClick={() => window.location.reload()}
+                        onClick={() => {
+                            localStorage.clear();
+                            sessionStorage.clear();
+                            window.location.reload();
+                        }}
                     >
                         <Power className="w-4 h-4" />
                         <span>Shut Down...</span>
