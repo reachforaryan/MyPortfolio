@@ -1,10 +1,10 @@
 import React from 'react';
 import { motion, type Variants } from 'framer-motion';
-import { Code, Sparkles, Brain, Cpu, Cloud, Laptop, ExternalLink, Github, Linkedin, Mail } from 'lucide-react';
+import { Code, Sparkles, Brain, Cpu, Cloud, Laptop, ExternalLink, Github, Linkedin, Mail, Download } from 'lucide-react';
 import { ABOUT_ME_CONFIG } from '@/config';
 
 export const AboutMe: React.FC = () => {
-    const { GREETING, AVATAR_URL, TITLE, BIO, STACK, AI_FOCUS, SOCIAL_LINKS } = ABOUT_ME_CONFIG;
+    const { GREETING, AVATAR_URL, TITLE, BIO, STACK, AI_FOCUS, SOCIAL_LINKS, RESUME_URL, RESUME_FILENAME } = ABOUT_ME_CONFIG;
 
     const container: Variants = {
         hidden: { opacity: 0 },
@@ -80,9 +80,19 @@ export const AboutMe: React.FC = () => {
                     </motion.div>
 
                     <div className="w-fit pr-12"> {/* Padding right to avoid overlap with socials */}
-                        <h1 className="text-4xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-vapor-pink to-vapor-purple drop-shadow mb-2 break-words w-fit">
-                            {GREETING}
-                        </h1>
+                        <div className="flex flex-col md:flex-row md:items-center gap-3 mb-2">
+                            <h1 className="text-4xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-vapor-pink to-vapor-purple drop-shadow break-words w-fit">
+                                {GREETING}
+                            </h1>
+                            <a
+                                href={RESUME_URL}
+                                download={RESUME_FILENAME}
+                                className="flex items-center gap-2 px-3 py-1.5 bg-vapor-purple/10 hover:bg-vapor-purple/20 border border-vapor-purple/30 rounded-full text-xs font-bold text-vapor-purple transition-all hover:scale-105 active:scale-95 w-fit h-fit"
+                            >
+                                <Download size={14} />
+                                <span>Resume</span>
+                            </a>
+                        </div>
                         <p className="text-vapor-blue/80 text-sm md:text-base font-medium flex flex-col md:flex-row items-center gap-2 justify-center md:justify-start">
                             <Sparkles size={16} className="text-vapor-mint" />
                             <span>{TITLE}</span>

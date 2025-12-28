@@ -84,6 +84,8 @@ export const PROJECTS_CONFIG = [
 
 export const ABOUT_ME_CONFIG = {
     GREETING: "Aryan Singh",
+    RESUME_URL: "/Aryan_Singh_Ai.pdf",
+    RESUME_FILENAME: "Aryan_Singh_Ai.pdf",
     AVATAR_URL: "https://win98icons.alexmeub.com/icons/png/computer_explorer-5.png",
     TITLE: "Computer Science Undergrad @ VIT Vellore | OCI Certified GenAI Professional",
     BIO: "I am a Digital Artisan building software that feels alive. I bridge the gap between complex AI research and high-performance user experiences, focusing on systems that can see, reason, and adapt.",
