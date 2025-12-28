@@ -181,10 +181,9 @@ export const DesktopPet: React.FC = () => {
 
     return (
         <div
-            className="fixed bottom-20 z-[40] transition-none"
+            className="fixed bottom-20 z-[40] transition-none will-change-transform"
             style={{
-                left: `${pos.x}px`,
-                transform: `translateX(-50%) translateY(${pos.jumpY}px)`, // Apply jumpY here
+                transform: `translate3d(${pos.x}px, ${pos.jumpY}px, 0) translateX(-50%)`,
                 width: 0,
                 height: 0,
                 overflow: 'visible'

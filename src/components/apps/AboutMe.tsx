@@ -11,14 +11,14 @@ export const AboutMe: React.FC = () => {
         show: {
             opacity: 1,
             transition: {
-                staggerChildren: 0.2,
-                delayChildren: 0.3
+                staggerChildren: 0.1,
+                delayChildren: 0.1
             }
         }
     };
 
     const item: Variants = {
-        hidden: { opacity: 0, y: 30, scale: 0.95, filter: "blur(5px)" },
+        hidden: { opacity: 0, y: 20, scale: 0.98, filter: "blur(4px)" },
         show: {
             opacity: 1,
             y: 0,
@@ -26,7 +26,7 @@ export const AboutMe: React.FC = () => {
             filter: "blur(0px)",
             transition: {
                 type: "spring",
-                stiffness: 50,
+                stiffness: 120,
                 damping: 20
             }
         }
@@ -55,7 +55,7 @@ export const AboutMe: React.FC = () => {
                                     rel="noopener noreferrer"
                                     initial={{ opacity: 0, scale: 0 }}
                                     animate={{ opacity: 1, scale: 1 }}
-                                    transition={{ delay: 0.8 + (i * 0.2), type: "spring", stiffness: 60, damping: 12 }}
+                                    transition={{ delay: 0.3 + (i * 0.1), type: "spring", stiffness: 200, damping: 15 }}
                                     whileHover={{ scale: 1.1, rotate: 10, transition: { type: "spring", stiffness: 300, damping: 15 } }}
                                     className="flex items-center justify-center w-8 h-8 bg-white/5 hover:bg-white/20 rounded-full text-vapor-blue transition-all border border-white/10 hover:border-vapor-blue/50"
                                     title={link.label}
@@ -69,7 +69,7 @@ export const AboutMe: React.FC = () => {
                     <motion.div
                         initial={{ scale: 0, rotate: -90 }}
                         animate={{ scale: 1, rotate: 0 }}
-                        transition={{ type: "spring", stiffness: 80, damping: 20, delay: 0.5 }}
+                        transition={{ type: "spring", stiffness: 120, damping: 15, delay: 0.2 }}
                         whileHover={{ rotate: 10, scale: 1.1, transition: { type: "spring", stiffness: 300, damping: 15 } }}
                         className="w-24 h-24 rounded-full bg-gradient-to-tr from-vapor-purple to-vapor-pink p-[2px] shadow-[0_0_20px_rgba(244,184,228,0.4)] shrink-0"
                     >
@@ -129,7 +129,7 @@ export const AboutMe: React.FC = () => {
                                         key={tech}
                                         initial={{ opacity: 0, scale: 0.8 }}
                                         animate={{ opacity: 1, scale: 1 }}
-                                        transition={{ delay: 1.0 + (i * 0.1) }}
+                                        transition={{ delay: 0.3 + (i * 0.05) }}
                                         whileHover={{ scale: 1.1, transition: { type: "spring", stiffness: 400, damping: 10 } }}
                                         className="px-2 py-1 bg-blue-500/10 text-blue-300 border border-blue-500/20 rounded text-xs cursor-default"
                                     >
@@ -150,7 +150,7 @@ export const AboutMe: React.FC = () => {
                                         key={tech}
                                         initial={{ opacity: 0, scale: 0.8 }}
                                         animate={{ opacity: 1, scale: 1 }}
-                                        transition={{ delay: 1.2 + (i * 0.1) }}
+                                        transition={{ delay: 0.4 + (i * 0.05) }}
                                         whileHover={{ scale: 1.1, transition: { type: "spring", stiffness: 400, damping: 10 } }}
                                         className="px-2 py-1 bg-purple-500/10 text-purple-300 border border-purple-500/20 rounded text-xs cursor-default"
                                     >
@@ -171,7 +171,7 @@ export const AboutMe: React.FC = () => {
                                         key={tech}
                                         initial={{ opacity: 0, scale: 0.8 }}
                                         animate={{ opacity: 1, scale: 1 }}
-                                        transition={{ delay: 1.4 + (i * 0.1) }}
+                                        transition={{ delay: 0.5 + (i * 0.05) }}
                                         whileHover={{ scale: 1.1, transition: { type: "spring", stiffness: 400, damping: 10 } }}
                                         className="px-2 py-1 bg-pink-500/10 text-pink-300 border border-pink-500/20 rounded text-xs cursor-default"
                                     >
@@ -192,7 +192,7 @@ export const AboutMe: React.FC = () => {
                                         key={tech}
                                         initial={{ opacity: 0, scale: 0.8 }}
                                         animate={{ opacity: 1, scale: 1 }}
-                                        transition={{ delay: 1.6 + (i * 0.1) }}
+                                        transition={{ delay: 0.6 + (i * 0.05) }}
                                         whileHover={{ scale: 1.1, transition: { type: "spring", stiffness: 400, damping: 10 } }}
                                         className="px-2 py-1 bg-yellow-500/10 text-yellow-300 border border-yellow-500/20 rounded text-xs cursor-default"
                                     >

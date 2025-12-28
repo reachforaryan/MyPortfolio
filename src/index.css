@@ -54,11 +54,11 @@
 @layer utilities {
   @keyframes scanline {
     0% {
-      background-position: 0 0;
+      transform: translate3d(0, 0, 0);
     }
 
     100% {
-      background-position: 0 4px;
+      transform: translate3d(0, 4px, 0);
     }
   }
 
@@ -81,6 +81,7 @@
     background-size: 100% 4px;
     z-index: 100;
     pointer-events: none;
+    will-change: transform;
     animation: scanline 0.5s linear infinite;
   }
 
