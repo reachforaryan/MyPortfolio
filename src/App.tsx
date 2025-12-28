@@ -26,7 +26,7 @@ import { MusicPlayer } from '@/components/apps/MusicPlayer';
 function App() {
   const [windows, setWindows] = useLocalStorage<Record<WindowId, WindowState>>('desktop:windows', INITIAL_WINDOWS);
   const [activeWindowId, setActiveWindowId] = useLocalStorage<WindowId | null>('desktop:activeWindowId', 'about');
-  const [isHdBackground, setIsHdBackground] = useLocalStorage('desktop:isHdBackground', false);
+  const [isHdBackground, setIsHdBackground] = useLocalStorage('desktop:isHdBackground', true);
   const [riceConfig, setRiceConfig] = useLocalStorage<RiceConfigState>('desktop:riceConfig', INITIAL_RICE_CONFIG);
 
   const focusWindow = (id: WindowId) => {
