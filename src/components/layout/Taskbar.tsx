@@ -9,10 +9,11 @@ interface TaskbarProps {
     onToggleWindow?: (id: WindowId) => void;
     onToggleTheme?: () => void;
     config?: RiceConfigState;
-    onUpdateConfig?: (updates: Partial<RiceConfigState>) => void;
+    onUpdateConfig: (updates: Partial<RiceConfigState>) => void;
+    onShutdown: () => void;
 }
 
-export const Taskbar: React.FC<TaskbarProps> = ({ windows = [], activeWindowId, onToggleWindow, onToggleTheme, config, onUpdateConfig }) => {
+export const Taskbar: React.FC<TaskbarProps> = ({ windows, activeWindowId, onToggleWindow, onToggleTheme, config, onUpdateConfig, onShutdown }) => {
     const [time, setTime] = useState(new Date());
     const [startOpen, setStartOpen] = useState(false);
 
@@ -29,6 +30,7 @@ export const Taskbar: React.FC<TaskbarProps> = ({ windows = [], activeWindowId, 
                 onOpenWindow={onToggleWindow}
                 config={config}
                 onUpdateConfig={onUpdateConfig}
+                onShutdown={onShutdown}
             />
 
             <div className="fixed bottom-0 left-0 right-0 h-10 bg-black/60 backdrop-blur-md border-t border-white/20 shadow-lg flex items-center px-1 z-50">
@@ -50,7 +52,7 @@ export const Taskbar: React.FC<TaskbarProps> = ({ windows = [], activeWindowId, 
                 </button>
                 {/* Window List */}
                 <div className="flex-1 flex items-center gap-1 overflow-x-auto px-2">
-                    {windows.map(win => (
+                    {windows?.map(win => (
                         <button
                             key={win.id}
                             className={cn(

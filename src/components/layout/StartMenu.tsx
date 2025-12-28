@@ -9,9 +9,10 @@ export interface StartMenuProps {
     onOpenWindow?: (id: WindowId) => void;
     config?: RiceConfigState;
     onUpdateConfig?: (updates: Partial<RiceConfigState>) => void;
+    onShutdown: () => void;
 }
 
-export const StartMenu: React.FC<StartMenuProps> = ({ isOpen, onClose, onOpenWindow, config, onUpdateConfig }) => {
+export const StartMenu: React.FC<StartMenuProps> = ({ isOpen, onClose, onOpenWindow, config, onUpdateConfig, onShutdown }) => {
     if (!isOpen) return null;
 
     return (
@@ -94,11 +95,7 @@ export const StartMenu: React.FC<StartMenuProps> = ({ isOpen, onClose, onOpenWin
                     <div className="h-[1px] bg-retro-gray-dark border-b border-white my-1" />
                     <button
                         className="w-full text-left px-2 py-2 hover:bg-retro-blue hover:text-white flex items-center gap-2 group text-sm border border-transparent"
-                        onClick={() => {
-                            localStorage.clear();
-                            sessionStorage.clear();
-                            window.location.reload();
-                        }}
+                        onClick={onShutdown}
                     >
                         <Power className="w-4 h-4" />
                         <span>Shut Down...</span>

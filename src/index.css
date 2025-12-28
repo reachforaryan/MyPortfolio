@@ -98,8 +98,56 @@
 
   body {
     @apply bg-background text-foreground;
+    background-color: black;
     font-family: 'Pixelify Sans', 'Courier New', Courier, monospace;
     overflow: hidden;
     /* Prevent body scroll for desktop app feel */
+  }
+}
+
+@layer utilities {
+  @keyframes tv-off {
+    0% {
+      transform: scale(1, 1);
+      filter: brightness(1);
+    }
+
+    40% {
+      transform: scale(1, 0.005);
+      filter: brightness(2);
+    }
+
+    100% {
+      transform: scale(0, 0);
+      filter: brightness(5);
+      opacity: 0;
+    }
+  }
+
+  @keyframes tv-on {
+    0% {
+      transform: scale(0, 0.005);
+      filter: brightness(5);
+      opacity: 0;
+    }
+
+    40% {
+      transform: scale(1, 0.005);
+      filter: brightness(2);
+    }
+
+    100% {
+      transform: scale(1, 1);
+      filter: brightness(1);
+      opacity: 1;
+    }
+  }
+
+  .crt-turn-off {
+    animation: tv-off 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+  }
+
+  .crt-turn-on {
+    animation: tv-on 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
   }
 }

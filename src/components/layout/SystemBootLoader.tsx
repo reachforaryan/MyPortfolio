@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { DESKTOP_PET_CONFIG } from '@/config';
+import { DESKTOP_PET_CONFIG, SYSTEM_CONFIG } from '@/config';
 
 interface SystemBootLoaderProps {
     onComplete: () => void;
@@ -25,19 +25,30 @@ export const SystemBootLoader: React.FC<SystemBootLoaderProps> = ({ onComplete }
             "> READY."
         ];
 
-        let index = 0;
-        const interval = setInterval(() => {
-            if (index < bootSequence.length) {
-                setLogs(prev => [...prev, bootSequence[index]]);
-                setProgress(((index + 1) / bootSequence.length) * 100);
-                index++;
-            } else {
-                clearInterval(interval);
-                setTimeout(onComplete, 800); // Brief pause on "READY"
-            }
-        }, 450);
+        let interval: ReturnType<typeof setInterval>;
 
-        return () => clearInterval(interval);
+
+
+        // Wait for CRT turn-on animation (800ms start + 600ms animation = ~1.5s total)
+        // We use LOG_START_DELAY from config.
+        const startTimer = setTimeout(() => {
+            let index = 0;
+            interval = setInterval(() => {
+                if (index < bootSequence.length) {
+                    setLogs(prev => [...prev, bootSequence[index]]);
+                    setProgress(((index + 1) / bootSequence.length) * 100);
+                    index++;
+                } else {
+                    clearInterval(interval);
+                    setTimeout(onComplete, SYSTEM_CONFIG.BOOT_DELAY); // Brief pause on "READY"
+                }
+            }, 450);
+        }, SYSTEM_CONFIG.LOG_START_DELAY);
+
+        return () => {
+            clearTimeout(startTimer);
+            if (interval) clearInterval(interval);
+        };
     }, [onComplete]);
 
     // Animation Loop

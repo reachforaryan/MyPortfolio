@@ -107,3 +107,10 @@ export const ABOUT_ME_CONFIG = {
     ],
     QUOTE: "\"Design is not just what it looks like and feels like. Design is how it works.\""
 };
+
+export const SYSTEM_CONFIG = {
+    BOOT_DELAY: 800,        // Time for black screen pause before TV turns on
+    SHUTDOWN_DELAY: 800,    // Time for CRT off animation before reload
+    LOG_START_DELAY: 100,   // Time to wait before typing logs (BOOT_DELAY + animation)
+    CRT_ANIMATION_DURATION: 600, // CSS animation duration (for reference)
+};

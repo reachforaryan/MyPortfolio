@@ -7,7 +7,8 @@ import {
   type WindowState,
   type RiceConfigState,
   INITIAL_WINDOWS,
-  INITIAL_RICE_CONFIG
+  INITIAL_RICE_CONFIG,
+  SYSTEM_CONFIG
 } from '@/config';
 
 import { Desktop } from '@/components/layout/Desktop';
@@ -26,9 +27,11 @@ import { RiceConfig } from '@/components/apps/RiceConfig';
 import { MusicPlayer } from '@/components/apps/MusicPlayer';
 import { Blog } from '@/components/apps/Blog';
 import { SystemBootLoader } from '@/components/layout/SystemBootLoader';
+import { TVFrame } from '@/components/layout/TVFrame';
 
 function App() {
   const [isBooting, setIsBooting] = useState(() => !sessionStorage.getItem('booted'));
+  const [isShuttingDown, setIsShuttingDown] = useState(false);
   const [windows, setWindows] = useLocalStorage<Record<WindowId, WindowState>>('desktop:windows', INITIAL_WINDOWS);
   const [activeWindowId, setActiveWindowId] = useLocalStorage<WindowId | null>('desktop:activeWindowId', 'about');
   const [isHdBackground, setIsHdBackground] = useLocalStorage('desktop:isHdBackground', true);
@@ -136,8 +139,17 @@ function App() {
   // Get visible windows for tiling
   const visibleWindows = Object.values(windows).filter(w => w.isOpen && !w.isMinimized);
 
+  const handleShutdown = () => {
+    setIsShuttingDown(true);
+    setTimeout(() => {
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.reload();
+    }, SYSTEM_CONFIG.SHUTDOWN_DELAY); // Wait for animation
+  };
+
   return (
-    <>
+    <TVFrame isPoweringOff={isShuttingDown} startOn={isBooting}>
       {isBooting ? (
         <SystemBootLoader onComplete={() => {
           setIsBooting(false);
@@ -242,10 +254,11 @@ function App() {
             onToggleTheme={() => setIsHdBackground(!isHdBackground)}
             config={riceConfig}
             onUpdateConfig={(updates) => setRiceConfig(prev => ({ ...prev, ...updates }))}
+            onShutdown={handleShutdown}
           />
         </Desktop>
       )}
-    </>
+    </TVFrame>
   );
 }
 
