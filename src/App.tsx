@@ -1,4 +1,5 @@
 import { useLocalStorage } from '@/hooks/use-local-storage';
+import { useMediaQuery } from '@/hooks/use-media-query';
 import { cn } from '@/lib/utils';
 import {
   type WindowId,
@@ -28,6 +29,7 @@ function App() {
   const [activeWindowId, setActiveWindowId] = useLocalStorage<WindowId | null>('desktop:activeWindowId', 'about');
   const [isHdBackground, setIsHdBackground] = useLocalStorage('desktop:isHdBackground', true);
   const [riceConfig, setRiceConfig] = useLocalStorage<RiceConfigState>('desktop:riceConfig', INITIAL_RICE_CONFIG);
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   const focusWindow = (id: WindowId) => {
     setActiveWindowId(id);
@@ -118,7 +120,12 @@ function App() {
   return (
     <Desktop backgroundImage={isHdBackground ? hdBackground : undefined} enableCrt={riceConfig.showCrt}>
       {/* Sidebar - Persistent Desktop Icons (Stage Manager) */}
-      <div className="flex flex-col flex-wrap gap-x-2 gap-y-6 h-full pt-4 content-start w-auto max-w-[50vw]">
+      <div className={cn(
+        "flex gap-x-2 gap-y-2 md:gap-y-6 pt-4 content-start transition-all duration-300",
+        isMobile
+          ? "w-full flex-row overflow-x-auto h-auto pb-2 shrink-0 items-center px-2"
+          : "flex-col flex-wrap h-full w-auto max-w-[50vw]"
+      )}>
         <DesktopIcon
           label="About Me"
           icon="https://win98icons.alexmeub.com/icons/png/computer_explorer-5.png"
@@ -158,12 +165,16 @@ function App() {
         className="flex-1 grid overflow-hidden h-full transition-all duration-300"
         style={{
           gap: `${riceConfig.gap}px`,
-          gridTemplateColumns: visibleWindows.length > 0
-            ? `repeat(${Math.ceil(Math.sqrt(visibleWindows.length))}, minmax(0, 1fr))`
-            : '1fr',
-          gridTemplateRows: visibleWindows.length > 0
-            ? `repeat(${Math.ceil(visibleWindows.length / Math.ceil(Math.sqrt(visibleWindows.length)))}, minmax(0, 1fr))`
-            : '1fr'
+          gridTemplateColumns: isMobile
+            ? '1fr' // Mobile: Single column
+            : visibleWindows.length > 0
+              ? `repeat(${Math.ceil(Math.sqrt(visibleWindows.length))}, minmax(0, 1fr))`
+              : '1fr',
+          gridTemplateRows: isMobile
+            ? `repeat(${visibleWindows.length}, minmax(0, 1fr))` // Mobile: Stack windows vertically
+            : visibleWindows.length > 0
+              ? `repeat(${Math.ceil(visibleWindows.length / Math.ceil(Math.sqrt(visibleWindows.length)))}, minmax(0, 1fr))`
+              : '1fr'
         }}
       >
         {visibleWindows.map((win) => (

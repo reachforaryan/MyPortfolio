@@ -39,7 +39,7 @@ export const Window: React.FC<WindowProps> = ({
     return (
         <div
             className={cn(
-                "flex flex-col min-w-[300px] flex-1 h-full transition-all duration-300 ease-in-out transform origin-center rounded-lg overflow-hidden relative",
+                "flex flex-col min-w-0 md:min-w-[300px] flex-1 h-full transition-all duration-300 ease-in-out transform origin-center rounded-lg overflow-hidden relative",
                 // Active State: Dynamic Vapor Glow + Pulse Border
                 isActive
                     ? "border-2 border-vapor-purple animate-border-pulse shadow-vapor-glow z-10 scale-[1.002]"

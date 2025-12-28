@@ -46,7 +46,7 @@ export const Taskbar: React.FC<TaskbarProps> = ({ windows = [], activeWindowId, 
                         alt="Start"
                         className="w-5 h-5 drop-shadow-[0_0_5px_rgba(255,255,255,0.5)]"
                     />
-                    Start
+                    <span className="hidden md:block">Start</span>
                 </button>
                 {/* Window List */}
                 <div className="flex-1 flex items-center gap-1 overflow-x-auto px-2">

@@ -13,7 +13,7 @@ export const Desktop: React.FC<DesktopProps> = ({ children, backgroundImage, ena
     return (
         <div
             className={cn(
-                "h-screen w-full relative overflow-hidden font-sans text-retro-black selection:bg-retro-blue selection:text-white flex flex-row gap-4 p-4 items-stretch pb-14",
+                "h-screen w-full relative overflow-hidden font-sans text-retro-black selection:bg-retro-blue selection:text-white flex flex-col md:flex-row gap-2 md:gap-4 p-2 md:p-4 items-stretch pb-14",
                 enableCrt && "scanlines",
                 backgroundImage ? "bg-cover bg-center" : "bg-retro-teal"
             )}
