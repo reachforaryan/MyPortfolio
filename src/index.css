@@ -1,153 +1,287 @@
-@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&display=swap');
+@import 'tailwindcss';
+@import './fonts.css';
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* ─────────────────────────────────────────────────────────────
+   SPECIMEN PLATE — design tokens
+   Monochrome ink ground, one signal colour (periwinkle) owning
+   whole roles: every leader line, index numeral, sparkle, active
+   state. One inverted bone-paper plate for scroll pacing.
+   ───────────────────────────────────────────────────────────── */
+@theme {
+  /* ─────────────────────────────────────────────────────────────
+     SPECIMEN PLATE — semantic tokens.
+
+     The archive prints in two states. INK is the dark plate; PAPER is
+     the sheet the Apparatus section always printed on, promoted to the
+     whole surface. Every token below flips between them, so a section
+     is written once and reads correctly in both. `invert-*` is the
+     opposite state, used by the one plate that deliberately contradicts
+     the page it sits in.
+     ───────────────────────────────────────────────────────────── */
+  --color-ground: #0b0b0e;
+  --color-surface: #121218;
+  --color-surface-2: #17171f;
+  --color-line: #24242e;
+  --color-fg: #e6e4de;
+  --color-fg-2: #8b8a93;
+  --color-fg-3: #63626c;
+  --color-signal: #a9a6f2;
+  --color-signal-dim: #6e6ba8;
+  --color-signal-lift: #c7c4ff;
+  --color-invert-ground: #d9d2c6;
+  --color-invert-fg: #17150f;
+
+  --font-display: 'Bodoni Moda', 'Didot', 'Bodoni MT', 'Times New Roman', serif;
+  --font-sans: 'Archivo', ui-sans-serif, system-ui, 'Helvetica Neue', sans-serif;
+  --font-mono: 'Martian Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --ease-plate: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-reg: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* PAPER. The Apparatus sheet, promoted to the whole archive. */
+:root[data-theme='paper'] {
+  --color-ground: #ded8cb;
+  --color-surface: #d5cec0;
+  --color-surface-2: #cdc5b6;
+  --color-line: #b6ad9c;
+  --color-fg: #17150f;
+  --color-fg-2: #4a4740;
+  --color-fg-3: #6e6a60;
+  --color-signal: #5f5ba8;
+  --color-signal-dim: #8b87c4;
+  --color-signal-lift: #3f3b86;
+  --color-invert-ground: #0b0b0e;
+  --color-invert-fg: #e6e4de;
+}
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-    --radius: 0.5rem;
+    color-scheme: dark;
+    --grid-unit: clamp(14px, 1.6vw, 24px);
   }
 
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+  :root[data-theme='paper'] {
+    color-scheme: light;
   }
-}
 
-@layer utilities {
-  @keyframes scanline {
-    0% {
-      transform: translate3d(0, 0, 0);
-    }
+  /* The plate re-inks rather than snapping between states. */
+  :root[data-theme-ready] body,
+  :root[data-theme-ready] body * {
+    transition:
+      background-color 420ms var(--ease-plate),
+      border-color 420ms var(--ease-plate),
+      color 420ms var(--ease-plate);
+  }
 
-    100% {
-      transform: translate3d(0, 4px, 0);
+  @media (prefers-reduced-motion: reduce) {
+    :root[data-theme-ready] body,
+    :root[data-theme-ready] body * {
+      transition: none;
     }
   }
 
-  .scanlines {
-    position: relative;
-    overflow: hidden;
-  }
-
-  .scanlines::before {
-    content: " ";
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    background: linear-gradient(to bottom,
-        rgba(18, 16, 16, 0) 50%,
-        rgba(0, 0, 0, 0.25) 50%);
-    background-size: 100% 4px;
-    z-index: 100;
-    pointer-events: none;
-    will-change: transform;
-    animation: scanline 0.5s linear infinite;
-  }
-
-  .glass-panel {
-    @apply bg-white/10 backdrop-blur-md border border-white/20 shadow-xl;
-  }
-}
-
-
-@layer base {
   * {
-    @apply border-border;
+    min-width: 0;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
-    @apply bg-background text-foreground;
-    background-color: black;
-    font-family: 'Pixelify Sans', 'Courier New', Courier, monospace;
+    margin: 0;
+    background: var(--color-ground);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    font-synthesis-weight: none;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: clip;
+  }
+
+  /* Lenis owns the scroll; keep the native bar out of the plate. */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+  .lenis.lenis-stopped {
     overflow: hidden;
-    /* Prevent body scroll for desktop app feel */
+  }
+
+  ::selection {
+    background: var(--color-signal);
+    color: var(--color-ground);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-signal-lift);
+    outline-offset: 3px;
+    border-radius: 1px;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  p,
+  figure,
+  blockquote {
+    margin: 0;
+  }
+
+  ol,
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  img,
+  svg,
+  canvas {
+    display: block;
+    max-width: 100%;
+  }
+
+  canvas {
+    touch-action: none;
+  }
+}
+
+@layer components {
+  /* Tracked mono microcopy — the annotation voice of the whole plate. */
+  .hud {
+    font-family: var(--font-mono);
+    font-size: clamp(0.5rem, 0.62vw, 0.66rem);
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    line-height: 1.5;
+    font-variation-settings: 'wdth' 100;
+  }
+
+  .hud-lg {
+    font-family: var(--font-mono);
+    font-size: clamp(0.62rem, 0.8vw, 0.8rem);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    line-height: 1.5;
+  }
+
+  /* Blocked structural sans — section kickers, plate labels. */
+  .block-label {
+    font-family: var(--font-sans);
+    font-weight: 800;
+    font-variation-settings: 'wdth' 118;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    line-height: 0.92;
+  }
+
+  /*
+   * Bodoni Moda is a didone: at the display optical size its hairlines are
+   * a fraction of a pixel, and on an ink ground they simply disappear — the
+   * bowl of an `A` at 2rem reads as a gap. `font-optical-sizing: auto` lets
+   * the face pick a sturdier cut as the size drops; `.display-sm` pins the
+   * text cut plus extra weight for anything set below roughly 2.5rem.
+   */
+  .display {
+    font-family: var(--font-display);
+    font-weight: 500;
+    line-height: 0.86;
+    letter-spacing: -0.02em;
+    font-optical-sizing: auto;
+  }
+
+  .display-sm {
+    font-variation-settings: 'opsz' 10;
+    font-weight: 600;
+    letter-spacing: -0.004em;
+  }
+
+  /* Hairline that reads as a drafted rule, not a border. */
+  .rule {
+    background: var(--color-line);
+    height: 1px;
+    width: 100%;
+  }
+
+  .rule-dotted {
+    height: 1px;
+    width: 100%;
+    background-image: linear-gradient(to right, var(--color-line) 0 2px, transparent 2px 6px);
+    background-size: 6px 1px;
+    background-repeat: repeat-x;
+  }
+
+  /* Vertical marginalia running up the page edge (refs #1, #4). */
+  .marginalia {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+  }
+
+  .marginalia-up {
+    writing-mode: vertical-rl;
+    rotate: 180deg;
+    text-orientation: mixed;
   }
 }
 
 @layer utilities {
-  @keyframes tv-off {
-    0% {
-      transform: scale(1, 1);
-      filter: brightness(1);
-    }
-
-    40% {
-      transform: scale(1, 0.005);
-      filter: brightness(2);
-    }
-
-    100% {
-      transform: scale(0, 0);
-      filter: brightness(5);
-      opacity: 0;
-    }
+  .plate-grid {
+    background-image:
+      linear-gradient(to right, color-mix(in oklab, var(--color-line) 60%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in oklab, var(--color-line) 60%, transparent) 1px, transparent 1px);
+    background-size: calc(var(--grid-unit) * 4) calc(var(--grid-unit) * 4);
   }
 
-  @keyframes tv-on {
-    0% {
-      transform: scale(0, 0.005);
-      filter: brightness(5);
-      opacity: 0;
-    }
-
-    40% {
-      transform: scale(1, 0.005);
-      filter: brightness(2);
-    }
-
-    100% {
-      transform: scale(1, 1);
-      filter: brightness(1);
-      opacity: 1;
-    }
+  .halftone {
+    background-image: radial-gradient(circle at center, currentColor 0.9px, transparent 1px);
+    background-size: 4px 4px;
   }
 
-  .crt-turn-off {
-    animation: tv-off 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+  .scanlines {
+    background-image: repeating-linear-gradient(
+      to right,
+      color-mix(in oklab, var(--color-line) 90%, transparent) 0 1px,
+      transparent 1px 5px
+    );
   }
 
-  .crt-turn-on {
-    animation: tv-on 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+}
+
+/* Motion is the enhancement; content ships visible. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
 }

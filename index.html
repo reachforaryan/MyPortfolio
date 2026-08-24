@@ -2,11 +2,43 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Aryan Singh</title>
+    <meta name="theme-color" content="#0B0B0E" />
+    <link rel="icon" type="image/svg+xml" href="/sparkle.svg" />
+    <link rel="preload" href="/fonts/v28-aFTQ7PxzY382XsXX63LUYJSKSKjWXFBP.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/v6-2V0aKIcADoYhV6w87xrTKjsSBanIRWbh8g.woff2" as="font" type="font/woff2" crossorigin />
+    <script>
+      // Set the plate state before first paint so the page never flashes.
+      try {
+        var t = localStorage.getItem('archive-theme');
+        if (t !== 'ink' && t !== 'paper')
+          t = matchMedia('(prefers-color-scheme: light)').matches ? 'paper' : 'ink';
+        document.documentElement.setAttribute('data-theme', t);
+        if (t === 'paper') document.querySelector('meta[name=theme-color]').content = '#ded8cb';
+      } catch (e) {}
+    </script>
+    <title>Aryan Singh — Specimen Archive</title>
+    <meta name="description" content="Plate archive of an engineer working on agentic AI systems, biomedical signal models and interfaces that behave." />
   </head>
   <body>
+    <!--
+      THESIS: A portfolio as a catalogued archive of specimens — numbered plates
+      with coordinates, readouts and annotations that draw themselves on arrival.
+      Refuses the hero/card-grid/footer arrangement and the terminal-CRT lane.
+      OWN-WORLD: Ink #0B0B0E ground, warm bone type, periwinkle #A9A6F2 owning
+      whole roles — every leader line, index numeral, sparkle, active state.
+      Bodoni Moda display / Archivo structure / Martian Mono microcopy. Hairline
+      rules, corner registration marks, halftone grain, one inverted paper sheet.
+      STORY: This person catalogues their own work like evidence; the reader
+      believes the rigour before reading a word, then writes.
+      FIRST VIEWPORT: Full-bleed ink, three-layer parallax star chart, ARYAN in
+      variable Bodoni over Singh in italic periwinkle, four leader-line callouts,
+      index list bottom-left, scroll cue bottom-right.
+      FORM: Annotated specimen plate — direction approved in the plan file.
+      FINISH: unreviewed and undocumented is unfinished; this build ends with the
+      finish review, the verdict, DESIGN.md, and every shipping raster carrying
+      its provenance.
+    -->
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

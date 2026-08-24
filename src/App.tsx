@@ -1,265 +1,58 @@
 import { useEffect, useState } from 'react';
-import { useLocalStorage } from '@/hooks/use-local-storage';
-import { useMediaQuery } from '@/hooks/use-media-query';
-import { cn } from '@/lib/utils';
-import {
-  type WindowId,
-  type WindowState,
-  type RiceConfigState,
-  INITIAL_WINDOWS,
-  INITIAL_RICE_CONFIG,
-  SYSTEM_CONFIG
-} from '@/config';
+import { ScrollTrigger, useSmoothScroll } from './lib/motion';
+import { Preloader } from './components/Preloader';
+import { Nav } from './components/Nav';
+import { Hero } from './sections/Hero';
+import { Manifest } from './sections/Manifest';
+import { Index } from './sections/Index';
+import { Work } from './sections/Work';
+import { Stack } from './sections/Stack';
+import { Trajectory } from './sections/Trajectory';
+import { Colophon } from './sections/Colophon';
+import Noise from './components/reactbits/Noise';
+import ClickSpark from './components/reactbits/ClickSpark';
 
-import { Desktop } from '@/components/layout/Desktop';
-import { Taskbar } from '@/components/layout/Taskbar';
-import { Window } from '@/components/ui/Window';
-import { DesktopIcon } from '@/components/ui/DesktopIcon';
-import hdBackground from '@/assets/hd.png';
+export default function App() {
+  const [ready, setReady] = useState(false);
+  useSmoothScroll();
 
-// App Components
-import { AboutMe } from '@/components/apps/AboutMe';
-import { Projects } from '@/components/apps/Projects';
-import { Contact } from '@/components/apps/Contact';
-import { Terminal } from '@/components/apps/Terminal';
-import { HubExplorer } from '@/components/apps/HubExplorer';
-import { RiceConfig } from '@/components/apps/RiceConfig';
-import { MusicPlayer } from '@/components/apps/MusicPlayer';
-import { Blog } from '@/components/apps/Blog';
-import { SystemBootLoader } from '@/components/layout/SystemBootLoader';
-import { TVFrame } from '@/components/layout/TVFrame';
-
-function App() {
-  const [isBooting, setIsBooting] = useState(() => !sessionStorage.getItem('booted'));
-  const [isShuttingDown, setIsShuttingDown] = useState(false);
-  const [windows, setWindows] = useLocalStorage<Record<WindowId, WindowState>>('desktop:windows', INITIAL_WINDOWS);
-  const [activeWindowId, setActiveWindowId] = useLocalStorage<WindowId | null>('desktop:activeWindowId', 'about');
-  const [isHdBackground, setIsHdBackground] = useLocalStorage('desktop:isHdBackground', true);
-  const [riceConfig, setRiceConfig] = useLocalStorage<RiceConfigState>('desktop:riceConfig', INITIAL_RICE_CONFIG);
-  const isMobile = useMediaQuery("(max-width: 768px)");
-
-  // Hydrate windows state with any new apps that might have been added to config (like Blog)
-  // but aren't in the user's localStorage yet.
+  /*
+   * Every trigger is created while the preloader holds <html> at
+   * overflow:hidden, so they measure against a page that cannot scroll and
+   * their start/end are meaningless — anything high enough on the page never
+   * fires. Re-measure once the curtain lifts, and again when the display face
+   * lands, since Bodoni changes every heading's height.
+   */
   useEffect(() => {
-    // Only run this if not booting, although running it while booting is fine too.
-    const missingKeys = Object.keys(INITIAL_WINDOWS).filter(key => !windows[key as WindowId]);
-    if (missingKeys.length > 0) {
-      setWindows(prev => ({
-        ...INITIAL_WINDOWS,
-        ...prev
-      }));
-    }
-  }, [windows, setWindows]);
-
-  const focusWindow = (id: WindowId) => {
-    setActiveWindowId(id);
-  };
-
-  const openWindow = (id: string) => {
-    const winId = id as WindowId;
-    if (!windows[winId]) return;
-
-    setWindows(prev => ({
-      ...prev,
-      [winId]: {
-        ...prev[winId],
-        isOpen: true,
-        isMinimized: false
-      }
-    }));
-    setActiveWindowId(winId);
-  };
-
-  const closeWindow = (id: string) => {
-    const winId = id as WindowId;
-    if (!windows[winId]) return;
-
-    setWindows(prev => ({
-      ...prev,
-      [winId]: {
-        ...prev[winId],
-        isOpen: false,
-        isMinimized: false
-      }
-    }));
-  };
-
-  const traverseWindow = (id: WindowId) => {
-    // Toggle minimize/restore
-    setWindows(prev => ({
-      ...prev,
-      [id]: {
-        ...prev[id],
-        isMinimized: !prev[id].isMinimized
-      }
-    }));
-    if (!windows[id].isMinimized) setActiveWindowId(id);
-  };
-
-  const toggleMaximize = (id: WindowId) => {
-    setWindows(prev => ({
-      ...prev,
-      [id]: {
-        ...prev[id],
-        isMaximized: !prev[id].isMaximized
-      }
-    }));
-    setActiveWindowId(id);
-  };
-
-  const renderWindowContent = (id: WindowId) => {
-    switch (id) {
-      case 'about':
-        return <AboutMe />;
-      case 'projects':
-        return <Projects />;
-      case 'contact':
-        return <Contact />;
-      case 'terminal':
-        return <Terminal
-          onOpenWindow={openWindow}
-          onCloseWindow={closeWindow}
-          windows={windows}
-          config={riceConfig}
-          onUpdateConfig={(updates) => setRiceConfig(prev => ({ ...prev, ...updates }))}
-        />;
-      case 'hub':
-        return <HubExplorer />;
-      case 'rice':
-        return <RiceConfig config={riceConfig} onUpdate={(updates) => setRiceConfig(prev => ({ ...prev, ...updates }))} />;
-      case 'music':
-        return <MusicPlayer />;
-      case 'blog':
-        return <Blog />;
-      default:
-        return null;
-    }
-  };
-
-  // Get visible windows for tiling
-  const visibleWindows = Object.values(windows).filter(w => w.isOpen && !w.isMinimized);
-
-  const handleShutdown = () => {
-    setIsShuttingDown(true);
-    setTimeout(() => {
-      localStorage.clear();
-      sessionStorage.clear();
-      window.location.reload();
-    }, SYSTEM_CONFIG.SHUTDOWN_DELAY); // Wait for animation
-  };
+    if (!ready) return;
+    // Next frame: refreshing inside a mount pass re-enters ScrollTrigger.
+    const raf = requestAnimationFrame(() => ScrollTrigger.refresh());
+    document.fonts?.ready.then(() => ScrollTrigger.refresh());
+    return () => cancelAnimationFrame(raf);
+  }, [ready]);
 
   return (
-    <TVFrame isPoweringOff={isShuttingDown} startOn={isBooting}>
-      {isBooting ? (
-        <SystemBootLoader onComplete={() => {
-          setIsBooting(false);
-          sessionStorage.setItem('booted', 'true');
-        }} />
-      ) : (
-        <Desktop backgroundImage={isHdBackground ? hdBackground : undefined} enableCrt={riceConfig.showCrt}>
-          {/* Sidebar - Persistent Desktop Icons (Stage Manager) */}
-          <div className={cn(
-            "flex gap-x-2 gap-y-2 md:gap-y-6 pt-4 content-start transition-all duration-300",
-            isMobile
-              ? "w-full flex-row overflow-x-auto h-auto pb-2 shrink-0 items-center px-2"
-              : "flex-col flex-wrap h-full w-auto max-w-[50vw]"
-          )}>
-            <DesktopIcon
-              label="About Me"
-              icon="https://win98icons.alexmeub.com/icons/png/computer_explorer-5.png"
-              onClick={() => openWindow('about')}
-            />
-            <DesktopIcon
-              label="Projects"
-              icon="https://win98icons.alexmeub.com/icons/png/directory_closed-4.png"
-              onClick={() => openWindow('projects')}
-            />
-            <DesktopIcon
-              label="Contact"
-              icon="https://win98icons.alexmeub.com/icons/png/envelope_closed-0.png"
-              onClick={() => openWindow('contact')}
-            />
-            <DesktopIcon
-              label="Terminal"
-              icon="https://win98icons.alexmeub.com/icons/png/console_prompt-0.png"
-              onClick={() => openWindow('terminal')}
-            />
-            <DesktopIcon
-              label="GitHub"
-              icon="/github.png"
-              onClick={() => openWindow('hub')}
-            />
-            <DesktopIcon
-              label="Music"
-              icon="https://win98icons.alexmeub.com/icons/png/cd_audio_cd-1.png"
-              onClick={() => openWindow('music')}
-            />
-            <DesktopIcon
-              label="My Blog"
-              icon="https://win98icons.alexmeub.com/icons/png/notepad-0.png"
-              onClick={() => openWindow('blog')}
-            />
+    <>
+      {!ready && <Preloader onDone={() => setReady(true)} />}
 
-          </div>
+      <Nav />
 
-          {/* Workspace - Tiling Area */}
-          {/* Workspace - Grid Area */}
-          <div
-            className="flex-1 grid overflow-hidden h-full transition-all duration-300"
-            style={{
-              gap: `${riceConfig.gap}px`,
-              gridTemplateColumns: isMobile
-                ? '1fr' // Mobile: Single column
-                : visibleWindows.length > 0
-                  ? `repeat(${Math.ceil(Math.sqrt(visibleWindows.length))}, minmax(0, 1fr))`
-                  : '1fr',
-              gridTemplateRows: isMobile
-                ? `repeat(${visibleWindows.length}, minmax(0, 1fr))` // Mobile: Stack windows vertically
-                : visibleWindows.length > 0
-                  ? `repeat(${Math.ceil(visibleWindows.length / Math.ceil(Math.sqrt(visibleWindows.length)))}, minmax(0, 1fr))`
-                  : '1fr'
-            }}
-          >
-            {visibleWindows.map((win) => (
-              <Window
-                key={win.id}
-                title={win.title}
-                isOpen={true}
-                onClose={() => closeWindow(win.id)}
-                onMinimize={() => traverseWindow(win.id as WindowId)}
-                onMaximize={() => toggleMaximize(win.id as WindowId)}
-                isMaximized={win.isMaximized}
-                isActive={activeWindowId === win.id}
-                onFocus={() => focusWindow(win.id)}
-                className={cn(
-                  "w-full h-full transition-all duration-300 min-h-0",
-                  win.isMaximized ? "fixed inset-0 z-50 rounded-none !w-screen !h-screen" : ""
-                )}
-                style={{
-                  borderColor: riceConfig.theme === 'cyberpunk' ? '#facc15' : riceConfig.theme === 'vaporwave' ? '#f472b6' : undefined,
-                  boxShadow: riceConfig.showGlow
-                    ? (riceConfig.theme === 'cyberpunk' ? '0 0 15px #facc15' : '0 0 15px #f472b6')
-                    : undefined
-                }}
-              >
-                {renderWindowContent(win.id)}
-              </Window>
-            ))}
-          </div>
+      <main id="main">
+        <Hero />
+        <Manifest />
+        <Trajectory />
+        <Index />
+        <Work />
+        <Stack />
+        <Colophon />
+      </main>
 
-          <Taskbar
-            windows={Object.values(windows).filter(w => w.isOpen)}
-            activeWindowId={activeWindowId}
-            onToggleWindow={traverseWindow}
-            onToggleTheme={() => setIsHdBackground(!isHdBackground)}
-            config={riceConfig}
-            onUpdateConfig={(updates) => setRiceConfig(prev => ({ ...prev, ...updates }))}
-            onShutdown={handleShutdown}
-          />
-        </Desktop>
-      )}
-    </TVFrame>
+      {/* film grain over the whole archive */}
+      <div className="pointer-events-none fixed inset-0 z-[80] mix-blend-soft-light">
+        <Noise patternSize={190} patternAlpha={11} patternRefreshInterval={3} />
+      </div>
+
+      <ClickSpark sparkColor="#c7c4ff" sparkSize={9} sparkRadius={22} sparkCount={4} duration={520} />
+    </>
   );
 }
-
-export default App;
