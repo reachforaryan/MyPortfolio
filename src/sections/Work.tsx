@@ -179,7 +179,7 @@ export function Work() {
                       </span>
                       <span>readout</span>
                     </div>
-                    <PlateFace seed={i * 91 + 7} className="w-full" />
+                    <PlateFace seed={i * 91 + 7} face={p.face} className="w-full" />
                     <div className="rule-dotted my-4" />
                     <p className="hud text-fg-3">
                       {p.title} · {p.field}

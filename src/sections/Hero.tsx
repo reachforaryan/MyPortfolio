@@ -73,13 +73,16 @@ export function Hero() {
         The archive's own halftone, made interactive: a dot field that parts
         around the pointer and settles back. It is the substrate the plates
         are printed on, so it stays far below the type in contrast.
+
+        Dark-on-light needs more separation than light-on-dark to read at
+        2.2px: the sheet's dots were 1.20:1 against ink's 1.40:1, so paper's
+        base runs a little darker than a straight token swap would give.
       */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <DotGrid
-          key={theme}
           dotSize={2.2}
           gap={26}
-          baseColor={paper ? '#cec5b3' : '#2a2a3c'}
+          baseColor={paper ? '#bcb29e' : '#2a2a3c'}
           activeColor={paper ? '#5f5ba8' : '#a9a6f2'}
           proximity={130}
           shockRadius={220}

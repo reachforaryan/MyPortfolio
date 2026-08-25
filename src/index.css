@@ -64,22 +64,6 @@
     color-scheme: light;
   }
 
-  /* The plate re-inks rather than snapping between states. */
-  :root[data-theme-ready] body,
-  :root[data-theme-ready] body * {
-    transition:
-      background-color 420ms var(--ease-plate),
-      border-color 420ms var(--ease-plate),
-      color 420ms var(--ease-plate);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    :root[data-theme-ready] body,
-    :root[data-theme-ready] body * {
-      transition: none;
-    }
-  }
-
   * {
     min-width: 0;
   }
@@ -108,6 +92,54 @@
   }
   .lenis.lenis-stopped {
     overflow: hidden;
+  }
+
+  /* The plate re-inks in one pass — see toggle() in lib/theme.ts. */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 420ms;
+    animation-timing-function: var(--ease-plate);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation: none;
+    }
+  }
+
+  /*
+   * The archive draws its own scrollbar: a square thumb running in a hairline
+   * channel. Platform hooks only — the thumb keeps its real drag behaviour,
+   * and the tokens mean it re-inks with the plate.
+   */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-signal-dim) var(--color-ground);
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-ground);
+    border-left: 1px solid var(--color-line);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-signal-dim);
+    /* a bar in a channel, not a slab filling it */
+    border: 2px solid var(--color-ground);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-signal);
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: var(--color-ground);
   }
 
   ::selection {

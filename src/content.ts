@@ -74,9 +74,13 @@ export const MANIFEST = {
 /** A readout is either a measured number (counted up) or a stated fact. */
 export type Readout = { value: number | string; suffix?: string; label: string };
 
+/** Which readout the plate's face draws — see components/plate/PlateFace. */
+export type Face = 'route' | 'respiration' | 'embedding' | 'digest' | 'graph';
+
 export type Project = {
   n: string;
   title: string;
+  face: Face;
   kind: string;
   field: string;
   summary: string;
@@ -90,6 +94,7 @@ export const PROJECTS: Project[] = [
   {
     n: '01',
     title: 'Transit Demand',
+    face: 'route',
     kind: 'Demand forecasting',
     field: 'AI & Intelligent Systems',
     summary:
@@ -106,6 +111,7 @@ export const PROJECTS: Project[] = [
   {
     n: '02',
     title: 'Sleep-HiT',
+    face: 'respiration',
     kind: 'Biomedical signal model',
     field: 'AI & Intelligent Systems',
     summary:
@@ -122,6 +128,7 @@ export const PROJECTS: Project[] = [
   {
     n: '03',
     title: 'Music Engine',
+    face: 'embedding',
     kind: 'Autonomous discovery agent',
     field: 'AI & Intelligent Systems',
     summary:
@@ -138,6 +145,7 @@ export const PROJECTS: Project[] = [
   {
     n: '04',
     title: 'Lokr',
+    face: 'digest',
     kind: 'Content-addressed vault',
     field: 'Systems, Web & Open Source',
     summary:
@@ -154,6 +162,7 @@ export const PROJECTS: Project[] = [
   {
     n: '05',
     title: 'System Design Playground',
+    face: 'graph',
     kind: 'Visual modelling tool',
     field: 'Systems, Web & Open Source',
     summary:
@@ -277,8 +286,11 @@ export const CONTACT = {
   cta: 'Send a message',
   send: 'Send',
   sending: 'Transmitting',
-  sent: 'Sent — I answer within a day.',
-  error: 'That did not send. Email reachforaryan@gmail.com directly.',
+  sentTitle: 'Message sent',
+  sentNote: 'It is in my inbox. I answer within a day.',
+  errorTitle: 'Not sent',
+  error: 'Something broke on the way. Email reachforaryan@gmail.com directly.',
+  retry: 'Try again',
   close: 'Close',
 };
 

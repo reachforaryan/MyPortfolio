@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { SECTIONS, IDENTITY } from '../content';
 import { Sparkle } from './plate/Sparkle';
 import { ThemeToggle } from './ThemeToggle';
 import { useTheme } from '../lib/theme';
-import { scrollToSection } from '../lib/motion';
+import { isJumping, scrollToSection } from '../lib/motion';
 import { openContact } from './ContactPlate';
 
 /**
@@ -43,6 +43,23 @@ export function Nav() {
       window.removeEventListener('scroll', onScroll);
     };
   }, []);
+
+  /*
+   * Keep the address bar honest: it used to be written only by a nav jump, so
+   * it kept claiming a plate long after the reader had scrolled past it. The
+   * first run is skipped so arriving at /#work is not rewritten before the
+   * browser has finished its own jump to that anchor.
+   */
+  const settled = useRef(false);
+  useEffect(() => {
+    if (!settled.current) {
+      settled.current = true;
+      return;
+    }
+    if (isJumping()) return; // the jump already wrote its destination
+    const top = active === SECTIONS[0].id;
+    history.replaceState(null, '', top ? location.pathname + location.search : `#${active}`);
+  }, [active]);
 
   // The Apparatus plate always contradicts the page, so the running head
   // over it has to invert too — in either theme.

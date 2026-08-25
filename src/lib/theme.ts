@@ -1,15 +1,9 @@
-import { useCallback, useEffect, useSyncExternalStore } from 'react';
+import { useCallback, useSyncExternalStore } from 'react';
+import { flushSync } from 'react-dom';
 
 export type Theme = 'ink' | 'paper';
 
 const KEY = 'archive-theme';
-
-/** Matches the inline script in index.html, which runs before first paint. */
-export function readTheme(): Theme {
-  const stored = localStorage.getItem(KEY);
-  if (stored === 'ink' || stored === 'paper') return stored;
-  return window.matchMedia('(prefers-color-scheme: light)').matches ? 'paper' : 'ink';
-}
 
 /*
  * One store, not one useState per caller. Every consumer used to hold its own
@@ -43,20 +37,27 @@ export function useTheme() {
     () => 'ink' as Theme
   );
 
-  useEffect(() => {
-    // Colour transitions are armed only after the first paint, so the initial
-    // render never animates from the wrong state.
-    const id = requestAnimationFrame(() =>
-      document.documentElement.setAttribute('data-theme-ready', '')
-    );
-    return () => cancelAnimationFrame(id);
-  }, []);
-
+  /*
+   * The whole page re-inks at once. Transitioning colour on every element was
+   * a repaint storm that landed in pieces; a view transition hands the browser
+   * one before-and-after snapshot to cross-fade on the compositor instead.
+   * flushSync is what puts React's re-render inside the callback, so the
+   * "after" snapshot is taken with the new state already applied.
+   */
   const toggle = useCallback(() => {
-    current = current === 'ink' ? 'paper' : 'ink';
-    document.documentElement.setAttribute('data-theme', current);
-    localStorage.setItem(KEY, current);
-    listeners.forEach((cb) => cb());
+    const apply = () =>
+      flushSync(() => {
+        current = current === 'ink' ? 'paper' : 'ink';
+        document.documentElement.setAttribute('data-theme', current);
+        document
+          .querySelector('meta[name=theme-color]')
+          ?.setAttribute('content', current === 'paper' ? '#ded8cb' : '#0B0B0E');
+        localStorage.setItem(KEY, current);
+        listeners.forEach((cb) => cb());
+      });
+
+    if (document.startViewTransition) document.startViewTransition(apply);
+    else apply();
   }, []);
 
   return { theme, toggle };

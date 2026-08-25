@@ -9,6 +9,9 @@ import { gsap, prefersReducedMotion } from '../lib/motion';
    (api/contact.ts) and never reaches the browser. */
 const ENDPOINT = '/api/contact';
 
+/** How long the acknowledgment holds before the plate closes itself. */
+const ACK_HOLD = 3.5;
+
 type Status = 'idle' | 'sending' | 'sent' | 'error';
 
 /*
@@ -24,15 +27,37 @@ export const openContact = () => opener?.();
  * containment, Esc, and inert background all come from the platform, so the
  * only thing left to write is the animation and the send.
  *
- * INK registers like a plate — marks converge, the frame opens from a hairline.
- * PAPER is a sheet laid down on the desk. The exits reverse their entrances.
+ * Colour comes from the ordinary theme tokens, so the panel flips with the
+ * page. Only the entrance differs by state: INK registers like a plate, PAPER
+ * is a sheet laid down on the desk. The exits reverse their entrances.
  */
 export function ContactPlate() {
   const dialog = useRef<HTMLDialogElement>(null);
   const panel = useRef<HTMLDivElement>(null);
+  const ack = useRef<HTMLDivElement>(null);
   const { theme } = useTheme();
   const [status, setStatus] = useState<Status>('idle');
   const paper = theme === 'paper';
+  const done = status === 'sent' || status === 'error';
+
+  const close = () => {
+    const el = dialog.current;
+    const box = panel.current;
+    if (!el || !box) return;
+    if (prefersReducedMotion()) {
+      el.close();
+      return;
+    }
+    gsap.to(box, {
+      ...(paper
+        ? { yPercent: 12, opacity: 0, scale: 0.98, duration: 0.28, ease: 'power2.in' }
+        : { scaleY: 0.02, opacity: 0, duration: 0.26, ease: 'expo.in' }),
+      onComplete: () => el.close(),
+    });
+  };
+  // The acknowledgment's timer fires long after its effect closed over `close`.
+  const closeRef = useRef(close);
+  closeRef.current = close;
 
   useEffect(() => {
     opener = () => {
@@ -78,21 +103,55 @@ export function ContactPlate() {
     };
   }, [paper]);
 
-  const close = () => {
-    const el = dialog.current;
-    const box = panel.current;
-    if (!el || !box) return;
+  /*
+   * The acknowledgment covers the panel rather than replacing the form, so
+   * nothing reflows behind it and a failed send keeps every field filled in.
+   * On success the rule under the heading unwinds — the hold *is* the rule, so
+   * there is no second countdown to keep in sync with it.
+   */
+  useEffect(() => {
+    const box = ack.current;
+    if (!box || !done) return;
+
+    const mark = box.querySelector('[data-ack-mark]');
+    const lines = box.querySelectorAll('[data-ack-line]');
+    const rule = box.querySelector('[data-ack-rule]');
+
+    const tl = gsap.timeline();
     if (prefersReducedMotion()) {
-      el.close();
-      return;
+      tl.fromTo(box, { opacity: 0 }, { opacity: 1, duration: 0.2 });
+    } else {
+      tl.fromTo(
+        box,
+        { clipPath: 'inset(50% 0% 50% 0%)' },
+        { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.42, ease: 'expo.out' }
+      )
+        .fromTo(
+          mark,
+          { scale: 0, opacity: 0 },
+          { scale: 1, opacity: 1, duration: 0.5, ease: 'back.out(2.4)' },
+          '-=0.2'
+        )
+        .fromTo(
+          lines,
+          { opacity: 0, y: 10 },
+          { opacity: 1, y: 0, duration: 0.36, stagger: 0.08, ease: 'power2.out' },
+          '-=0.25'
+        )
+        .fromTo(rule, { scaleX: 0 }, { scaleX: 1, duration: 0.4, ease: 'power3.inOut' }, '-=0.3');
     }
-    gsap.to(box, {
-      ...(paper
-        ? { yPercent: 12, opacity: 0, scale: 0.98, duration: 0.28, ease: 'power2.in' }
-        : { scaleY: 0.02, opacity: 0, duration: 0.26, ease: 'expo.in' }),
-      onComplete: () => el.close(),
-    });
-  };
+
+    if (status === 'sent') {
+      tl.to(rule, {
+        scaleX: 0,
+        duration: ACK_HOLD,
+        ease: 'none',
+        onComplete: () => closeRef.current(),
+      });
+    }
+
+    return () => void tl.kill();
+  }, [done, status]);
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -111,7 +170,7 @@ export function ContactPlate() {
       setStatus('sent');
       form.reset();
     } catch {
-      setStatus('error');
+      setStatus('error'); // the fields keep whatever they typed
     }
   }
 
@@ -133,25 +192,23 @@ export function ContactPlate() {
     >
       <div
         ref={panel}
-        className={`relative origin-center border px-6 py-8 sm:px-9 sm:py-10 ${
-          paper ? 'border-invert-fg/25 bg-invert-ground text-invert-fg' : 'border-line bg-surface'
-        }`}
+        className="relative origin-center overflow-hidden border border-line bg-surface px-6 py-8 sm:px-9 sm:py-10"
       >
         <span data-reg>
-          <Registration className={paper ? 'text-invert-fg/40' : 'text-signal-dim'} inset={8} size={14} />
+          <Registration className="text-signal-dim" inset={8} size={14} />
         </span>
 
         <div data-field className="flex items-center gap-3">
-          <span className={`hud flex items-center gap-1.5 ${paper ? 'text-signal-lift' : 'text-signal'}`}>
+          <span className="hud flex items-center gap-1.5 text-signal">
             <Sparkle size={8} />
             {CONTACT.kicker}
           </span>
-          <span className={`h-px flex-1 ${paper ? 'bg-invert-fg/20' : 'bg-line'}`} />
+          <span className="h-px flex-1 bg-line" />
           <button
             type="button"
             onClick={close}
             aria-label={CONTACT.close}
-            className={`hud transition-colors ${paper ? 'text-invert-fg/50 hover:text-invert-fg' : 'text-fg-3 hover:text-signal'}`}
+            className="hud text-fg-3 transition-colors hover:text-signal"
           >
             ✕
           </button>
@@ -159,18 +216,11 @@ export function ContactPlate() {
 
         <h2
           data-field
-          className={`display display-sm mt-6 text-[clamp(1.9rem,5vw,2.8rem)] leading-[1] ${
-            paper ? 'text-invert-fg' : 'text-fg'
-          }`}
+          className="display display-sm mt-6 text-[clamp(1.9rem,5vw,2.8rem)] leading-[1] text-fg"
         >
           {CONTACT.heading}
         </h2>
-        <p
-          data-field
-          className={`mt-3 max-w-sm text-pretty text-[0.95rem] leading-[1.6] ${
-            paper ? 'text-invert-fg/70' : 'text-fg-2'
-          }`}
-        >
+        <p data-field className="mt-3 max-w-sm text-pretty text-[0.95rem] leading-[1.6] text-fg-2">
           {CONTACT.body}
         </p>
 
@@ -214,13 +264,7 @@ export function ContactPlate() {
             className={`${field} resize-none`}
           />
 
-          <div data-field className="flex flex-wrap items-center justify-between gap-3 pt-1">
-            <p
-              aria-live="polite"
-              className={`hud ${status === 'error' ? 'text-signal-lift' : paper ? 'text-invert-fg/60' : 'text-fg-3'}`}
-            >
-              {status === 'sent' ? CONTACT.sent : status === 'error' ? CONTACT.error : ''}
-            </p>
+          <div data-field className="flex items-center justify-end pt-1">
             <button
               type="submit"
               disabled={status === 'sending'}
@@ -237,6 +281,36 @@ export function ContactPlate() {
             </p>
           )}
         </form>
+
+        {done && (
+          <div
+            ref={ack}
+            role="status"
+            className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-surface px-8 text-center"
+          >
+            <Sparkle data-ack-mark size={36} className="text-signal" />
+            <h3
+              data-ack-line
+              className="display display-sm text-[clamp(1.6rem,4.4vw,2.3rem)] leading-none text-fg"
+            >
+              {status === 'sent' ? CONTACT.sentTitle : CONTACT.errorTitle}
+            </h3>
+            <span data-ack-rule className="block h-px w-28 origin-left bg-signal" />
+            <p data-ack-line className="hud max-w-xs text-fg-2">
+              {status === 'sent' ? CONTACT.sentNote : CONTACT.error}
+            </p>
+            {status === 'error' && (
+              <button
+                data-ack-line
+                type="button"
+                onClick={() => setStatus('idle')}
+                className="hud-lg mt-2 border border-signal-dim px-5 py-2.5 transition-colors duration-300 hover:border-signal hover:bg-signal hover:text-ground"
+              >
+                {CONTACT.retry}
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </dialog>
   );

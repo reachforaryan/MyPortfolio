@@ -57,7 +57,6 @@ export function Manifest() {
           <div className="relative aspect-[4/5] w-full border border-line/70 bg-surface">
             <Registration className="text-signal-dim" inset={-1} size={16} />
             <HalftoneReveal
-              key={theme}
               src="/specimen-placeholder.webp"
               inkColor={theme === 'paper' ? '#5f5ba8' : '#a9a6f2'}
               paperColor={theme === 'paper' ? '#ded8cb' : '#0b0b0e'}

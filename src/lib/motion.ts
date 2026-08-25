@@ -41,6 +41,14 @@ export function useSmoothScroll() {
   }, []);
 }
 
+/*
+ * True while a programmatic jump is travelling. The page passes through every
+ * section on the way, so without this the URL would rattle through all of them
+ * before landing. Expiry-based, so an interrupted scroll heals itself.
+ */
+let jumpUntil = 0;
+export const isJumping = () => Date.now() < jumpUntil;
+
 /**
  * Navigate to a plate. Lenis owns the scroll, so an anchor's native jump would
  * snap past its animation — callers preventDefault and come here instead.
@@ -50,8 +58,12 @@ export function scrollToSection(id: string) {
   const el = document.getElementById(id);
   if (!el) return;
 
-  if (lenis) lenis.scrollTo(el, { duration: 0.9, easing: easeOutExpo });
-  else el.scrollIntoView({ behavior: 'auto' });
+  if (lenis) {
+    jumpUntil = Date.now() + 1000; // the tween is 900ms
+    lenis.scrollTo(el, { duration: 0.9, easing: easeOutExpo });
+  } else {
+    el.scrollIntoView({ behavior: 'auto' });
+  }
 
   history.replaceState(null, '', `#${id}`);
   // Keyboard users land in the section they asked for, not back at the top.
