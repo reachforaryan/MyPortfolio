@@ -58,16 +58,6 @@ src/
   components/reactbits/   vendored from reactbits.dev, retuned to the palette
   sections/               Hero · Manifest · Trajectory · Index · Work · Stack · Colophon
 ```
-
-### Content
-
-Every string lives in `src/content.ts`. One rule, stated in the file itself:
-**readout values are facts, never estimates.** Where a real measured number
-exists it is a `number` and the interface counts up to it; where none exists the
-readout prints a fact instead (`'Transformer'`, `'GTFS'`). The design rests on
-the claim that those numbers are measured. See [REPLACE.md](./REPLACE.md) for
-what's still placeholder.
-
 ---
 
 ## Decisions worth knowing
