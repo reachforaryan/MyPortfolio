@@ -238,6 +238,18 @@
   }
 }
 
+/* Stars breathe and drift — one animation, randomised per star in StarChart. */
+@keyframes star-twinkle {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translate3d(2px, -3px, 0) scale(0.86);
+    opacity: 0.55;
+  }
+}
+
 @layer utilities {
   .plate-grid {
     background-image:

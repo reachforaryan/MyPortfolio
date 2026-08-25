@@ -11,7 +11,7 @@ function seeded(seed: number) {
   };
 }
 
-type Star = { x: number; y: number; size: number; weight: number; opacity: number };
+type Star = { x: number; y: number; size: number; weight: number; opacity: number; dur: number; delay: number };
 
 const LAYERS = [
   { count: 34, depth: 0.16, size: [4, 9], weight: 0.28, opacity: [0.16, 0.34] },
@@ -42,6 +42,9 @@ export function StarChart({ className = '' }: { className?: string }) {
             size: cfg.size[0] + rand() * (cfg.size[1] - cfg.size[0]),
             weight: cfg.weight,
             opacity: cfg.opacity[0] + rand() * (cfg.opacity[1] - cfg.opacity[0]),
+            // Nothing in the field should breathe in step with anything else.
+            dur: 4 + rand() * 5,
+            delay: rand() * -6,
           });
         }
         return { ...cfg, stars };
@@ -76,16 +79,6 @@ export function StarChart({ className = '' }: { className?: string }) {
         };
         gsap.ticker.add(tick);
 
-        // Slow twinkle on the foreground crosses only.
-        gsap.to(gsap.utils.toArray('[data-layer="2"] > *', scope), {
-          opacity: 0.25,
-          duration: 2.4,
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut',
-          stagger: { each: 0.7, from: 'random' },
-        });
-
         return () => void gsap.ticker.remove(tick);
       }
     },
@@ -117,7 +110,13 @@ export function StarChart({ className = '' }: { className?: string }) {
                 transform: 'translate(-50%, -50%)',
               }}
             >
-              <Sparkle size={s.size} weight={s.weight} />
+              <Sparkle
+                size={s.size}
+                weight={s.weight}
+                style={{
+                  animation: `star-twinkle ${s.dur}s ease-in-out ${s.delay}s infinite alternate`,
+                }}
+              />
             </span>
           ))}
         </div>

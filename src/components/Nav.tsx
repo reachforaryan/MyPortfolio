@@ -4,6 +4,7 @@ import { Sparkle } from './plate/Sparkle';
 import { ThemeToggle } from './ThemeToggle';
 import { useTheme } from '../lib/theme';
 import { scrollToSection } from '../lib/motion';
+import { openContact } from './ContactPlate';
 
 /**
  * The archive's running head: a scroll-progress hairline and a right-edge
@@ -67,12 +68,18 @@ export function Nav() {
         Skip to content
       </a>
 
-      {/* plate state */}
-      <ThemeToggle
-        theme={theme}
-        onToggle={toggle}
-        className="fixed bottom-4 left-4 z-50 xl:bottom-6 xl:left-[1.4rem]"
-      />
+      {/* controls: quick contact + plate state, out of every section's way */}
+      <div className="fixed top-3 right-3 z-50 flex items-center gap-2 sm:top-4 sm:right-4">
+        <button
+          type="button"
+          onClick={openContact}
+          className="hud group flex items-center gap-2 border border-signal-dim bg-ground px-3 py-2 text-fg-2 transition-colors duration-300 hover:border-signal hover:text-fg"
+        >
+          <Sparkle size={9} className="text-signal" />
+          Contact
+        </button>
+        <ThemeToggle theme={theme} onToggle={toggle} />
+      </div>
 
       {/* plate index */}
       <nav

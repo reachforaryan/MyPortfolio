@@ -3,7 +3,7 @@ import { HERO, IDENTITY } from '../content';
 import { StarChart } from '../components/plate/StarChart';
 import { Annotations } from '../components/plate/Annotations';
 import { Sparkle } from '../components/plate/Sparkle';
-import { gsap, useGsap, prefersReducedMotion } from '../lib/motion';
+import { gsap, useGsap, usePointer, prefersReducedMotion } from '../lib/motion';
 import VariableProximity from '../components/reactbits/VariableProximity';
 import Crosshair from '../components/reactbits/Crosshair';
 import DotGrid from '../components/reactbits/DotGrid';
@@ -12,12 +12,14 @@ import { useTheme } from '../lib/theme';
 export function Hero() {
   const root = useRef<HTMLElement>(null);
   const wordmark = useRef<HTMLDivElement>(null);
+  const pointer = usePointer(1);
   const { theme } = useTheme();
   const paper = theme === 'paper';
 
   useGsap(
     ({ scope }) => {
       if (prefersReducedMotion()) return;
+      const cleanups: (() => void)[] = [];
 
       gsap
         .timeline({ delay: 0.15 })
@@ -30,6 +32,22 @@ export function Hero() {
         .from('[data-fade]', { opacity: 0, duration: 0.8, stagger: 0.06, ease: 'power2.out' }, '-=0.8')
         .from('[data-hairline]', { scaleX: 0, duration: 1, ease: 'power3.inOut' }, '-=1.1');
 
+      /*
+       * SINGH prints as two plates. They fall out of register as the pointer
+       * travels and sit perfectly registered with it centred — the press
+       * metaphor, and a different mechanism from ARYAN's per-letter weight.
+       */
+      const ghost = scope.querySelector<HTMLElement>('[data-offplate]');
+      if (ghost) {
+        const set = { x: gsap.quickSetter(ghost, 'x', 'px'), y: gsap.quickSetter(ghost, 'y', 'px') };
+        const drift = () => {
+          set.x(pointer.current.x * 6);
+          set.y(pointer.current.y * 4);
+        };
+        gsap.ticker.add(drift);
+        cleanups.push(() => gsap.ticker.remove(drift));
+      }
+
       // The wordmark sinks as the archive opens beneath it.
       gsap.to('[data-sink]', {
         yPercent: 26,
@@ -37,6 +55,8 @@ export function Hero() {
         ease: 'none',
         scrollTrigger: { trigger: scope, start: 'top top', end: 'bottom top', scrub: true },
       });
+
+      return () => cleanups.forEach((fn) => fn());
     },
     root,
     []
@@ -88,7 +108,8 @@ export function Hero() {
       </div>
 
       {/* ── plate header rule ─────────────────────────────────────────── */}
-      <header className="relative z-10 flex items-baseline gap-4">
+      {/* pr clears the fixed control cluster in the top-right corner */}
+      <header className="relative z-10 flex items-baseline gap-4 pr-[13.5rem] sm:pr-[15rem]">
         <span data-fade className="hud text-signal">
           {IDENTITY.plateId}
         </span>
@@ -129,13 +150,21 @@ export function Hero() {
             </span>
 
             <span className="block overflow-hidden">
-              <span
-                data-rise
-                aria-hidden="true"
-                className="display block text-[clamp(3.8rem,17vw,15rem)] text-signal italic"
-                style={{ fontVariationSettings: "'opsz' 96, 'wght' 500" }}
-              >
-                Singh
+              <span data-rise aria-hidden="true" className="relative block">
+                {/* the off-register plate, drifting under the pointer */}
+                <span
+                  data-offplate
+                  className="display absolute inset-0 block text-[clamp(3.8rem,17vw,15rem)] text-fg/25 italic will-change-transform"
+                  style={{ fontVariationSettings: "'opsz' 96, 'wght' 500" }}
+                >
+                  Singh
+                </span>
+                <span
+                  className="display relative block text-[clamp(3.8rem,17vw,15rem)] text-signal italic"
+                  style={{ fontVariationSettings: "'opsz' 96, 'wght' 500" }}
+                >
+                  Singh
+                </span>
               </span>
             </span>
           </h1>
@@ -152,8 +181,7 @@ export function Hero() {
 
       {/* ── footer: index list + cue ──────────────────────────────────── */}
       <footer className="relative z-10 flex flex-wrap items-end justify-between gap-6">
-        {/* pb clears the fixed plate-state pill in the bottom-left gutter */}
-        <div data-fade className="pb-12 sm:pb-11">
+        <div data-fade>
           <div className="hud mb-2 flex items-center gap-1.5 text-signal">
             <Sparkle size={8} />
             {HERO.kicker}

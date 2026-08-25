@@ -27,7 +27,24 @@ for an invented percentage to make a plate look busier.
 
 `Profile.pdf` sits at the repo root, not in `public/`, so it is not served.
 
+## The contact form needs a key
+
+The contact plate posts to [Web3Forms](https://web3forms.com) — sign up, then put
+the access key in a `.env` at the repo root:
+
+```
+VITE_WEB3FORMS_KEY=your-key-here
+```
+
+Then add the same variable in **Vercel → Settings → Environment Variables**
+(all three environments) and redeploy — Vite bakes it in at build time, so a
+deploy without it ships the fallback. The build log warns when it is missing.
+
+`.env` is gitignored. The key is public by design — it names the destination
+inbox and authorises nothing — but this repo is public, so it stays out of it.
+**Without the key the form still works**: the send button hands the composed
+message to the visitor's mail client instead.
+
 ## Not built (say the word)
 
-Per-project case-study routes · blog/MDX · CMS · contact-form backend
-(contact is `mailto:` + résumé download) · analytics.
+Per-project case-study routes · blog/MDX · CMS · analytics.

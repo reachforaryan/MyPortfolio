@@ -10,6 +10,8 @@ import { Stack } from './sections/Stack';
 import { Trajectory } from './sections/Trajectory';
 import { Colophon } from './sections/Colophon';
 import ClickSpark from './components/reactbits/ClickSpark';
+import { ContactPlate } from './components/ContactPlate';
+import { Analytics } from '@vercel/analytics/react';
 
 /*
  * Film grain: one tiled feTurbulence, no canvas and no rAF loop. Two knobs —
@@ -58,12 +60,17 @@ export default function App() {
         <Colophon />
       </main>
 
+      <ContactPlate />
+
       {/* film grain over the whole archive */}
       <div
         aria-hidden="true"
         className="pointer-events-none fixed inset-0 z-[80] mix-blend-soft-light"
         style={GRAIN}
       />
+
+      {/* cookieless page views; inert outside production */}
+      <Analytics />
 
       <ClickSpark sparkColor="#c7c4ff" sparkSize={9} sparkRadius={22} sparkCount={4} duration={520} />
     </>

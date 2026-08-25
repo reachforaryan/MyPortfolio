@@ -265,6 +265,23 @@ export const COLOPHON = {
   set: 'Set in Bodoni Moda, Archivo and Martian Mono. Built with React, GSAP and Lenis.',
 };
 
+export const CONTACT = {
+  kicker: 'Transmission',
+  heading: 'Say something',
+  body: 'Straight to my inbox. If a plate here is close to a problem you have, say which one — I answer within a day.',
+  fields: {
+    name: 'Your name',
+    email: 'Your email',
+    message: 'Message',
+  },
+  cta: 'Send a message',
+  send: 'Send',
+  sending: 'Transmitting',
+  sent: 'Sent — I answer within a day.',
+  error: 'That did not send. Email reachforaryan@gmail.com directly.',
+  close: 'Close',
+};
+
 export const SECTIONS = [
   { id: 'hero', n: '01', label: 'Frontispiece' },
   { id: 'manifest', n: '02', label: 'Manifest' },

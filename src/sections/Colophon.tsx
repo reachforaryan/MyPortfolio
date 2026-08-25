@@ -1,9 +1,10 @@
 import { useRef } from 'react';
-import { COLOPHON, IDENTITY } from '../content';
+import { COLOPHON, CONTACT, IDENTITY } from '../content';
 import { SectionHead } from '../components/plate/SectionHead';
 import { Sparkle } from '../components/plate/Sparkle';
 import { gsap, useGsap, prefersReducedMotion } from '../lib/motion';
 import Magnet from '../components/reactbits/Magnet';
+import { openContact } from '../components/ContactPlate';
 
 export function Colophon() {
   const root = useRef<HTMLElement>(null);
@@ -67,13 +68,14 @@ export function Colophon() {
           </p>
 
           <Magnet padding={90} magnetStrength={6} wrapperClassName="mt-10 inline-block">
-            <a
-              href={`mailto:${IDENTITY.email}`}
+            <button
+              type="button"
+              onClick={openContact}
               className="group inline-flex items-center gap-3 border border-signal-dim px-6 py-4 transition-colors duration-300 hover:border-signal hover:bg-signal hover:text-ground"
             >
               <Sparkle size={11} className="text-signal transition-colors group-hover:text-ground" />
-              <span className="hud-lg">{IDENTITY.email}</span>
-            </a>
+              <span className="hud-lg">{CONTACT.cta}</span>
+            </button>
           </Magnet>
         </div>
 
