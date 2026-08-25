@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
-import { CONTACT, IDENTITY } from '../content';
+import { CONTACT } from '../content';
 import { Sparkle } from './plate/Sparkle';
 import { Registration } from './plate/PlateFrame';
 import { useTheme } from '../lib/theme';
 import { gsap, prefersReducedMotion } from '../lib/motion';
 
-const ENDPOINT = 'https://api.web3forms.com/submit';
-const KEY = import.meta.env.VITE_WEB3FORMS_KEY as string | undefined;
+/* Our own proxy, not Web3Forms directly — the access key lives on the server
+   (api/contact.ts) and never reaches the browser. */
+const ENDPOINT = '/api/contact';
 
 type Status = 'idle' | 'sending' | 'sent' | 'error';
 
@@ -99,27 +100,12 @@ export function ContactPlate() {
     const data = Object.fromEntries(new FormData(form)) as Record<string, string>;
     if (data.botcheck) return; // honeypot: only a bot fills a hidden field
 
-    // No key configured (a fresh clone) — hand the message to their mail client
-    // rather than dropping it on the floor.
-    if (!KEY) {
-      const body = `${data.message}\n\n— ${data.name} (${data.email})`;
-      window.location.href = `mailto:${IDENTITY.email}?subject=${encodeURIComponent(
-        `Archive — ${data.name}`
-      )}&body=${encodeURIComponent(body)}`;
-      return;
-    }
-
     setStatus('sending');
     try {
       const res = await fetch(ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({
-          access_key: KEY,
-          subject: `Archive — ${data.name}`,
-          from_name: 'Specimen Archive',
-          ...data,
-        }),
+        body: JSON.stringify(data),
       });
       if (!res.ok) throw new Error(String(res.status));
       setStatus('sent');
@@ -245,9 +231,9 @@ export function ContactPlate() {
             </button>
           </div>
 
-          {import.meta.env.DEV && !KEY && (
-            <p className="hud pt-1 text-signal-lift">
-              No VITE_WEB3FORMS_KEY — send falls back to mailto:
+          {import.meta.env.DEV && (
+            <p className="hud pt-1 text-fg-3">
+              Dev: /api/contact is a Vercel function — run `vercel dev` to send for real.
             </p>
           )}
         </form>

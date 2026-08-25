@@ -29,21 +29,24 @@ for an invented percentage to make a plate look busier.
 
 ## The contact form needs a key
 
-The contact plate posts to [Web3Forms](https://web3forms.com) — sign up, then put
-the access key in a `.env` at the repo root:
+The contact plate posts to `/api/contact` (`api/contact.ts`), a Vercel Edge
+function that adds the [Web3Forms](https://web3forms.com) access key and
+forwards the message. The key is **server-only** — no `VITE_` prefix, so Vite
+never injects it into the bundle and it never reaches a visitor's browser.
+
+Set it in **Vercel → Settings → Environment Variables** (all three
+environments), then redeploy:
 
 ```
-VITE_WEB3FORMS_KEY=your-key-here
+WEB3FORMS_KEY=your-key-here
 ```
 
-Then add the same variable in **Vercel → Settings → Environment Variables**
-(all three environments) and redeploy — Vite bakes it in at build time, so a
-deploy without it ships the fallback. The build log warns when it is missing.
+Without it the endpoint answers `500 Contact is not configured.` and the dialog
+shows its error line, which points people at the email address directly.
 
-`.env` is gitignored. The key is public by design — it names the destination
-inbox and authorises nothing — but this repo is public, so it stays out of it.
-**Without the key the form still works**: the send button hands the composed
-message to the visitor's mail client instead.
+**Locally**, `npm run dev` serves the site but not `/api` — Vite has no
+functions. Use `vercel dev` (or `npx vercel dev`) to exercise the real send
+path; the dialog says as much in dev.
 
 ## Not built (say the word)
 
