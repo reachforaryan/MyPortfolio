@@ -16,7 +16,7 @@ npm run preview
 src/
   content.ts              every string on the site — the only file you edit for content
   index.css               design tokens (@theme) + the plate's component classes
-  lib/motion.ts           GSAP + ScrollTrigger + Lenis; useGsap, useInView, usePointer
+  lib/motion.ts           GSAP + ScrollTrigger + Lenis; useGsap, usePointer, scrollToSection
   components/plate/       the archive's own vocabulary
     Sparkle               the four-point registration star, the site's only icon
     Annotations           the signature interaction — leader lines that draw themselves
@@ -40,8 +40,9 @@ export. Readout values are facts, never estimates — see
 ## Motion
 
 One engine: GSAP + ScrollTrigger for scroll choreography, Lenis for smooth
-scroll, both on the same ticker. `motion` is present only because three of the
-vendored ReactBits components require it.
+scroll, both on the same ticker. Lenis is also what the plate index navigates
+with — `scrollToSection` drives it, because an anchor's native hash jump would
+snap straight past the animation.
 
 Every scroll animation is behind `prefers-reduced-motion`; content renders
 visible by default and motion is the enhancement.

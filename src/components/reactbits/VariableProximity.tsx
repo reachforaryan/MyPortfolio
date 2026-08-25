@@ -7,7 +7,6 @@ import {
   type CSSProperties,
   type HTMLAttributes
 } from 'react';
-import { motion } from 'motion/react';
 
 function useAnimationFrame(callback: () => void) {
   useEffect(() => {
@@ -181,7 +180,7 @@ const VariableProximity = forwardRef<HTMLSpanElement, VariableProximityProps>((p
           {word.split('').map(letter => {
             const currentLetterIndex = letterIndex++;
             return (
-              <motion.span
+              <span
                 key={currentLetterIndex}
                 ref={el => {
                   letterRefs.current[currentLetterIndex] = el;
@@ -193,7 +192,7 @@ const VariableProximity = forwardRef<HTMLSpanElement, VariableProximityProps>((p
                 aria-hidden="true"
               >
                 {letter}
-              </motion.span>
+              </span>
             );
           })}
           {wordIndex < words.length - 1 && <span className="inline-block">&nbsp;</span>}

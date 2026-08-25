@@ -36,7 +36,6 @@
   --font-mono: 'Martian Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
   --ease-plate: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-reg: cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 /* PAPER. The Apparatus sheet, promoted to the whole archive. */
@@ -232,11 +231,6 @@
   }
 
   /* Vertical marginalia running up the page edge (refs #1, #4). */
-  .marginalia {
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
-  }
-
   .marginalia-up {
     writing-mode: vertical-rl;
     rotate: 180deg;

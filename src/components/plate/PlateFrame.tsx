@@ -1,5 +1,3 @@
-import type { ReactNode } from 'react';
-
 /** Bracketed corner registration marks — every plate in the archive wears them. */
 export function Registration({
   className = '',
@@ -31,39 +29,5 @@ export function Registration({
         </svg>
       ))}
     </div>
-  );
-}
-
-/** Plate wrapper: hairline border, registration marks, optional index + caption. */
-export function Plate({
-  children,
-  n,
-  caption,
-  className = '',
-  frameClass = 'text-line',
-}: {
-  children: ReactNode;
-  n?: string;
-  caption?: string;
-  className?: string;
-  frameClass?: string;
-}) {
-  return (
-    <figure className={`relative ${className}`}>
-      <div className="relative border border-line/70">
-        <Registration className={frameClass} inset={-1} />
-        {n && (
-          <span className="hud absolute -top-px left-3 z-10 -translate-y-1/2 bg-ground px-1.5 text-signal-dim">
-            {n}
-          </span>
-        )}
-        {children}
-      </div>
-      {caption && (
-        <figcaption className="hud mt-3 text-fg-3">
-          <span className="text-signal-dim">◇</span> {caption}
-        </figcaption>
-      )}
-    </figure>
   );
 }

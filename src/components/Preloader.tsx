@@ -54,6 +54,9 @@ export function Preloader({ onDone }: { onDone: () => void }) {
       const fonts = document.fonts?.ready ?? Promise.resolve();
       const bail = new Promise((r) => setTimeout(r, 4000)); // never trap the page
       Promise.race([Promise.all([intro, fonts]), bail]).then(() => {
+        // StrictMode tears the first mount down before this resolves; building
+        // a timeline against its detached scope only warns about lost targets.
+        if (!scope.isConnected) return;
         gsap
           .timeline({ onComplete: finish })
           .to('[data-pl-word], [data-pl-meta]', { opacity: 0, duration: 0.4, ease: 'power2.in' })

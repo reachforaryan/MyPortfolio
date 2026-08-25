@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type RefObject } from 'react';
+import { useEffect, useRef, type RefObject } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
@@ -71,34 +71,17 @@ export function scrollToSection(id: string) {
  * this correctly.
  */
 export function useGsap(
-  setup: (ctx: { scope: HTMLElement }) => void,
+  setup: (ctx: { scope: HTMLElement }) => void | (() => void),
   scope: RefObject<HTMLElement | null>,
   deps: unknown[] = []
 ) {
   useGSAP(
     () => {
-      if (scope.current) setup({ scope: scope.current });
+      // Returning setup's cleanup: gsap.context collects it and runs it on revert.
+      if (scope.current) return setup({ scope: scope.current });
     },
     { scope: scope as RefObject<HTMLElement>, dependencies: deps }
   );
-}
-
-/** True once the element has entered the viewport — gates expensive canvases. */
-export function useInView<T extends Element>(margin = '200px') {
-  const ref = useRef<T>(null);
-  const [inView, setInView] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), {
-      rootMargin: margin,
-    });
-    io.observe(el);
-    return () => io.disconnect();
-  }, [margin]);
-
-  return [ref, inView] as const;
 }
 
 /** Normalised pointer position (-1..1) with a lerp, for parallax depth. */

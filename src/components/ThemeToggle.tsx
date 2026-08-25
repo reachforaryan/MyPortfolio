@@ -37,7 +37,7 @@ export function ThemeToggle({
       <span className="hud flex items-center gap-1.5 whitespace-nowrap">
         <span className={paper ? 'text-fg-3' : 'text-signal'}>Ink</span>
         <span aria-hidden="true" className="text-fg-3">
-          ⇄
+          ·
         </span>
         <span className={paper ? 'text-signal' : 'text-fg-3'}>Paper</span>
       </span>

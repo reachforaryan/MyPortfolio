@@ -19,12 +19,10 @@ export type Callout = {
 export function Annotations({
   items,
   className = '',
-  start = 'top 78%',
   backdrop = false,
 }: {
   items: Callout[];
   className?: string;
-  start?: string;
   /** Ink plate behind each label — for annotating a busy image. */
   backdrop?: boolean;
 }) {
@@ -42,11 +40,29 @@ export function Annotations({
       gsap.set(runs, { scaleX: 0 });
       gsap.set(tags, { opacity: 0 });
 
-      gsap
-        .timeline({ scrollTrigger: { trigger: scope, start, once: true } })
+      const tl = gsap
+        .timeline({ paused: true })
         .to(marks, { scale: 1, opacity: 1, duration: 0.45, stagger: 0.1, ease: 'back.out(2.2)' })
         .to(runs, { scaleX: 1, duration: 0.55, stagger: 0.1, ease: 'power3.inOut' }, '-=0.4')
         .to(tags, { opacity: 1, duration: 0.4, stagger: 0.1, ease: 'power2.out' }, '-=0.35');
+
+      /*
+       * Deliberately NOT on ScrollTrigger — the same trap Readout documents. A
+       * `once: true` trigger fires only on a downward crossing, so arriving at
+       * a plate from a #plate link and scrolling back up left every callout
+       * above stuck at opacity 0, drawn but invisible. An IntersectionObserver
+       * reports the element's real state on observe, whichever side it starts.
+       */
+      const io = new IntersectionObserver(
+        ([entry]) => {
+          if (!entry.isIntersecting) return;
+          io.disconnect();
+          tl.play();
+        },
+        { rootMargin: '0px 0px -12% 0px' }
+      );
+      io.observe(scope);
+      return () => io.disconnect();
     },
     root,
     [items]

@@ -67,8 +67,9 @@ Reach for these before writing new utility soup.
 ## Motion
 
 One engine, in `src/lib/motion.ts`: GSAP + ScrollTrigger for choreography, Lenis for
-smooth scroll, both on GSAP's ticker (`useSmoothScroll`). The `motion` package is a
-dependency only because three vendored ReactBits components need it.
+smooth scroll, both on GSAP's ticker (`useSmoothScroll`). The module keeps the live
+Lenis instance so `scrollToSection(id)` can drive it — anchors `preventDefault` and
+call that, since a native hash jump snaps past the animation.
 
 - **Always use `useGsap(setup, ref, deps)`**, not raw `gsap.context` in an effect. It
   delegates to `@gsap/react`'s `useGSAP`, which sequences correctly under StrictMode;
@@ -99,4 +100,6 @@ Do not "clean up" either exception without reproducing the bug it fixes.
 - `sections/` — one file per plate, each importing its copy from `content.ts` and
   opening with `<SectionHead n kicker right />`.
 
-Expensive canvases (`DotGrid`, `Noise`, `StarChart`) are gated with `useInView`.
+The Hero deliberately stacks three pointer-driven layers (`DotGrid`, `StarChart`,
+`Crosshair`) plus the page-wide `Noise` grain — that cost is a design decision, not
+an oversight.

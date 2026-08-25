@@ -105,7 +105,7 @@ export function Hero() {
       {/* ── the thesis ────────────────────────────────────────────────── */}
       <div data-sink className="relative z-10 flex flex-1 items-center justify-center">
         <div ref={wordmark} className="relative w-full max-w-[min(92vw,1400px)] py-10">
-          <Annotations items={HERO.annotations} start="top 90%" className="hidden md:block" />
+          <Annotations items={HERO.annotations} className="hidden md:block" />
 
           <h1 className="relative z-30 text-center">
             <span className="sr-only">{IDENTITY.name}</span>
@@ -152,7 +152,8 @@ export function Hero() {
 
       {/* ── footer: index list + cue ──────────────────────────────────── */}
       <footer className="relative z-10 flex flex-wrap items-end justify-between gap-6">
-        <div data-fade>
+        {/* pb clears the fixed plate-state pill in the bottom-left gutter */}
+        <div data-fade className="pb-12 sm:pb-11">
           <div className="hud mb-2 flex items-center gap-1.5 text-signal">
             <Sparkle size={8} />
             {HERO.kicker}

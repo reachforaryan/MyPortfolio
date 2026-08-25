@@ -9,8 +9,19 @@ import { Work } from './sections/Work';
 import { Stack } from './sections/Stack';
 import { Trajectory } from './sections/Trajectory';
 import { Colophon } from './sections/Colophon';
-import Noise from './components/reactbits/Noise';
 import ClickSpark from './components/reactbits/ClickSpark';
+
+/*
+ * Film grain: one tiled feTurbulence, no canvas and no rAF loop. Two knobs —
+ * opacity is how much grain there is (0.16 lands near the old canvas's
+ * patternAlpha of 11/255; higher flattens the ground into a wash), and the
+ * matrix scale is how dark it is (0.2667 = flat 1/3 grayscale, 20% darker).
+ */
+const GRAIN = {
+  backgroundImage:
+    "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='190' height='190'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0.2667 0.2667 0.2667 0 0 0.2667 0.2667 0.2667 0 0 0.2667 0.2667 0.2667 0 0 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.16'/%3E%3C/svg%3E\")",
+  backgroundSize: '190px 190px',
+};
 
 export default function App() {
   const [ready, setReady] = useState(false);
@@ -48,9 +59,11 @@ export default function App() {
       </main>
 
       {/* film grain over the whole archive */}
-      <div className="pointer-events-none fixed inset-0 z-[80] mix-blend-soft-light">
-        <Noise patternSize={190} patternAlpha={11} patternRefreshInterval={3} />
-      </div>
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-[80] mix-blend-soft-light"
+        style={GRAIN}
+      />
 
       <ClickSpark sparkColor="#c7c4ff" sparkSize={9} sparkRadius={22} sparkCount={4} duration={520} />
     </>
