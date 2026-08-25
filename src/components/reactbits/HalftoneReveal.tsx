@@ -1,4 +1,4 @@
-import { useRef, useEffect, type CSSProperties } from 'react';
+import { useRef, useEffect, type CSSProperties, type ReactNode } from 'react';
 import { Renderer, Program, Triangle, Mesh, Texture } from 'ogl';
 
 const DEFAULT_SRC = 'https://picsum.photos/seed/halftone-reveal/1200/800';
@@ -35,6 +35,8 @@ export interface HalftoneRevealProps {
   borderRadius?: string;
   className?: string;
   style?: CSSProperties;
+  /** Overlays that must not steal the pointer from the reveal — they bubble to it. */
+  children?: ReactNode;
 }
 
 const vertex = `#version 300 es
@@ -210,7 +212,8 @@ const HalftoneReveal = ({
   trigger = 'hover',
   borderRadius = '16px',
   className = '',
-  style
+  style,
+  children
 }: HalftoneRevealProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<Renderer | null>(null);
@@ -376,7 +379,9 @@ const HalftoneReveal = ({
       ref={containerRef}
       className={`relative w-full h-full overflow-hidden touch-none cursor-crosshair ${className}`.trim()}
       style={{ borderRadius, ...style }}
-    />
+    >
+      {children}
+    </div>
   );
 };
 

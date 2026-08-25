@@ -3,6 +3,7 @@ import { SECTIONS, IDENTITY } from '../content';
 import { Sparkle } from './plate/Sparkle';
 import { ThemeToggle } from './ThemeToggle';
 import { useTheme } from '../lib/theme';
+import { scrollToSection } from '../lib/motion';
 
 /**
  * The archive's running head: a scroll-progress hairline and a right-edge
@@ -82,26 +83,34 @@ export function Nav() {
           {SECTIONS.map((s) => {
             const on = active === s.id;
             return (
-              <li key={s.id} className="flex items-center justify-end gap-2.5">
-                {/* labels stay out of the page's way until the nav is asked */}
-                <span
-                  className={`hud opacity-0 transition-opacity duration-300 group-hover/nav:opacity-100 ${
-                    on ? sig : dim
-                  }`}
-                >
-                  {s.label}
-                </span>
+              <li key={s.id} className="flex items-center justify-end">
                 <a
                   href={`#${s.id}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    scrollToSection(s.id);
+                  }}
                   aria-current={on ? 'true' : undefined}
-                  className="group flex w-14 items-center justify-end gap-2 py-1"
+                  className="group flex items-center justify-end gap-2.5 py-1"
                 >
-                  <span className={`hud transition-colors ${on ? sig : dim}`}>{s.n}</span>
+                  {/* labels stay out of the page's way until the nav is asked */}
                   <span
-                    className={`block h-px transition-all duration-500 ${
-                      on ? `w-6 ${paper ? 'bg-invert-fg' : 'bg-signal'}` : `w-2.5 ${rule} group-hover:w-4`
+                    className={`hud opacity-0 transition-opacity duration-300 group-hover/nav:opacity-100 ${
+                      on ? sig : dim
                     }`}
-                  />
+                  >
+                    {s.label}
+                  </span>
+                  <span className="flex w-14 items-center justify-end gap-2">
+                    <span className={`hud transition-colors ${on ? sig : dim}`}>{s.n}</span>
+                    <span
+                      className={`block h-px transition-all duration-500 ${
+                        on
+                          ? `w-6 ${paper ? 'bg-invert-fg' : 'bg-signal'}`
+                          : `w-2.5 ${rule} group-hover:w-4`
+                      }`}
+                    />
+                  </span>
                 </a>
               </li>
             );

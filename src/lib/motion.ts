@@ -11,27 +11,52 @@ export { gsap, ScrollTrigger };
 export const prefersReducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+const easeOutExpo = (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t));
+
+/** The live instance, so navigation can drive the same scroll the wheel does. */
+let lenis: Lenis | null = null;
+
 /** Smooth scroll, driven off GSAP's ticker so ScrollTrigger stays in phase. */
 export function useSmoothScroll() {
   useEffect(() => {
     if (prefersReducedMotion()) return;
 
-    const lenis = new Lenis({
+    lenis = new Lenis({
       duration: 1.15,
-      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      easing: easeOutExpo,
       touchMultiplier: 1.6,
     });
+    const instance = lenis;
 
-    lenis.on('scroll', ScrollTrigger.update);
-    const tick = (time: number) => lenis.raf(time * 1000);
+    instance.on('scroll', ScrollTrigger.update);
+    const tick = (time: number) => instance.raf(time * 1000);
     gsap.ticker.add(tick);
     gsap.ticker.lagSmoothing(0);
 
     return () => {
       gsap.ticker.remove(tick);
-      lenis.destroy();
+      instance.destroy();
+      if (lenis === instance) lenis = null;
     };
   }, []);
+}
+
+/**
+ * Navigate to a plate. Lenis owns the scroll, so an anchor's native jump would
+ * snap past its animation — callers preventDefault and come here instead.
+ * Without Lenis (reduced motion) it is a plain jump, which is the point.
+ */
+export function scrollToSection(id: string) {
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  if (lenis) lenis.scrollTo(el, { duration: 0.9, easing: easeOutExpo });
+  else el.scrollIntoView({ behavior: 'auto' });
+
+  history.replaceState(null, '', `#${id}`);
+  // Keyboard users land in the section they asked for, not back at the top.
+  el.setAttribute('tabindex', '-1');
+  el.focus({ preventScroll: true });
 }
 
 /**

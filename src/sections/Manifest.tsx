@@ -68,14 +68,18 @@ export function Manifest() {
               angle={22}
               contrast={1.5}
               invert
-              revealRadius={0.34}
+              revealRadius={0.2}
               edge={0.72}
               idleReveal={0.14}
               trigger="hover"
               borderRadius="0px"
               className="absolute inset-0 size-full"
-            />
-            <Annotations items={MANIFEST.callouts} backdrop className="hidden sm:block" />
+            >
+              {/* Nested, not a sibling: as an overlay it swallowed every
+                  pointermove before the reveal's own listeners saw one, so the
+                  loupe worked on touch (where it is hidden) and nowhere else. */}
+              <Annotations items={MANIFEST.callouts} backdrop className="hidden sm:block" />
+            </HalftoneReveal>
             <span className="hud absolute top-3 left-3 z-30 text-signal">{MANIFEST.specimen.fig}</span>
             <span className="hud absolute right-3 bottom-3 z-30 text-fg-3">
               {MANIFEST.specimen.spec}
