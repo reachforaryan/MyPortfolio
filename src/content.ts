@@ -15,7 +15,7 @@ export const IDENTITY = {
   last: 'SINGH',
   role: 'RAG & agentic AI systems · ML/DL · computer vision · data science',
   plateId: 'PLT-0001-AS',
-  locale: 'Greater Surat Area, IN',
+  locale: 'India',
   email: 'reachforaryan@gmail.com',
   phone: '+91 88262 81309',
   github: 'https://github.com/reachforaryan',
@@ -34,7 +34,7 @@ export const HERO = {
   annotations: [
     { id: 'a1', x: 26, y: 16, label: 'Reading', value: 'CS @ VIT ’26' },
     { id: 'a2', x: 77, y: 33, label: 'Status', value: 'Open to work' },
-    { id: 'a3', x: 21, y: 68, label: 'Base', value: 'Surat, IN' },
+    { id: 'a3', x: 21, y: 68, label: 'Base', value: 'India' },
     { id: 'a4', x: 81, y: 87, label: 'Archive', value: '05 plates' },
   ],
   scrollCue: 'Scroll to enter the archive',
@@ -45,7 +45,7 @@ export const MANIFEST = {
   heading: 'I build AI systems that reason and act.',
   body: [
     'From RAG pipelines to multi-agent workflows. I like picking unconventional problems: forecasting Delhi bus route demand with transformers and GTFS data, detecting sleep apnea from tracheal audio using cross-modal transformers, building an autonomous music-discovery bot on vector similarity search.',
-    'I have worked both sides of applied AI — agentic document-processing pipelines with LangGraph and CrewAI, cutting hallucination rates through better vector indexing, and real-time computer vision models for low-light object detection. Currently exploring agentic orchestration, RAG systems, and where ML meets real-world data: GIS, transit, health.',
+    'I have worked both sides of applied AI, agentic document-processing pipelines with LangGraph and CrewAI, cutting hallucination rates through better vector indexing, and real-time computer vision models for low-light object detection. Currently exploring agentic orchestration, RAG systems, and where ML meets real-world data: GIS, transit, health.',
   ],
   quote: 'Open to AI/ML engineering, data science, and analyst roles.',
   /* The subject plate carries no photograph. It is a portrait made of what
@@ -213,7 +213,7 @@ export const TRAJECTORY = [
     n: '05',
     layer: 'Exosphere',
     band: '700–10 000 km',
-    year: 'Jan – Mar 2026',
+    year: 'Jan – Jun 2026',
     title: 'Artificial Intelligence Intern',
     org: 'Beans.ai',
     note: 'Built a lightweight OCR pipeline in Python (Tesseract, EasyOCR) to read unit numbers off driver photos, with OpenCV preprocessing for low light. Labelled spatial point-of-interest datasets the team trained detection models on, and validated extracted text against internal geocoded databases.',
